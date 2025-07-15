@@ -1,0 +1,78 @@
+.card .card-body h5 {
+    font-size: 14px;
+    font-weight: bold;
+}
+.card .card-body p {
+    font-size: 12px;
+    font-weight: bold;
+}
+.list-group-item small {
+    color: #d3d3d3;
+}
+
+.siswa-results, .pos-results {
+    max-height: 300px;
+    overflow-y: auto;
+}
+.item-transaksi .card {
+    border: 1px solid #ddd;
+}
+
+/* Style untuk bulan yang dipilih */
+.bulan-item.selected .card {
+    border: 3px solid #007bff !important;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Style untuk bulan lunas */
+.bulan-item[data-status="LUNAS"] .card {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: white;
+}
+
+/* Style untuk bulan belum lunas */
+.bulan-item[data-status="BELUM LUNAS"] .card {
+    background: linear-gradient(45deg, #dcaa35, #e6fd14) !important;
+    color: white;
+}
+
+/* Style untuk bulan belum bayar */
+.bulan-item[data-status="BELUM BAYAR"] .card {
+    background: linear-gradient(45deg, #dc3545, #fd7e14) !important;
+    color: white;
+}
+
+/* Style untuk bulan yang belum jatuh tempo */
+.bulan-item[data-status="belum tempo"] .card {
+    background: #f8f9fa !important;
+    color: #6c757d;
+}
+
+/* Hover effect */
+.bulan-item:hover .card {
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+/* Disable pointer untuk bulan lunas */
+.bulan-item[data-status="lunas"] {
+    cursor: not-allowed !important;
+}
+
+.pos-item:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+/* Style untuk field sisa */
+#sisa.text-success {
+    color: #28a745 !important;
+    font-weight: bold;
+}
+
+#sisa.text-danger {
+    color: #dc3545 !important;
+    font-weight: bold;
+}

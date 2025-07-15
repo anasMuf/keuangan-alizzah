@@ -1,0 +1,203 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="100%" height="100%">
+  <!-- Background -->
+  <rect width="1200" height="900" fill="#f5f5f5"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1200" height="60" fill="#3f51b5"/>
+  <text x="30" y="38" font-family="Arial" font-size="22" fill="white">Sistem Manajemen Keuangan Sekolah</text>
+
+  <!-- Sidebar -->
+  <rect x="0" y="60" width="250" height="840" fill="#fff"/>
+  <rect x="0" y="60" width="250" height="840" fill="#fafafa"/>
+  <line x1="250" y1="60" x2="250" y2="900" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Sidebar Menu Items -->
+  <rect x="0" y="150" width="250" height="50" fill="#e8eaf6"/>
+  <text x="20" y="182" font-family="Arial" font-size="16" fill="#333">Dashboard</text>
+
+  <text x="20" y="232" font-family="Arial" font-size="16" fill="#333">Data Master</text>
+  <text x="40" y="267" font-family="Arial" font-size="14" fill="#666">Siswa</text>
+  <text x="40" y="302" font-family="Arial" font-size="14" fill="#666">Kelas</text>
+  <text x="40" y="337" font-family="Arial" font-size="14" fill="#3f51b5" font-weight="bold">Siswa per Kelas</text>
+  <text x="40" y="372" font-family="Arial" font-size="14" fill="#666">Tahun Ajaran</text>
+
+  <text x="20" y="422" font-family="Arial" font-size="16" fill="#333">Keuangan</text>
+  <text x="40" y="457" font-family="Arial" font-size="14" fill="#666">Pos Keuangan</text>
+  <text x="40" y="492" font-family="Arial" font-size="14" fill="#666">Transaksi Masuk</text>
+  <text x="40" y="527" font-family="Arial" font-size="14" fill="#666">Transaksi Keluar</text>
+
+  <text x="20" y="577" font-family="Arial" font-size="16" fill="#333">Laporan</text>
+
+  <!-- Main Content Area -->
+  <rect x="250" y="60" width="950" height="840" fill="white"/>
+
+  <!-- Page Title -->
+  <text x="280" y="110" font-family="Arial" font-size="24" fill="#333" font-weight="bold">Manajemen Siswa per Kelas</text>
+
+  <!-- Filter Tools -->
+  <rect x="280" y="130" width="910" height="70" fill="#f9f9f9" rx="5" ry="5"/>
+
+  <text x="300" y="165" font-family="Arial" font-size="14" fill="#666">Tahun Ajaran:</text>
+  <rect x="400" y="145" width="180" height="35" fill="white" stroke="#ccc" stroke-width="1" rx="3" ry="3"/>
+  <text x="415" y="168" font-family="Arial" font-size="14" fill="#333">2024/2025</text>
+  <polygon points="560,160 580,150 580,170" fill="#666"/>
+
+  <text x="620" y="165" font-family="Arial" font-size="14" fill="#666">Kelas:</text>
+  <rect x="670" y="145" width="180" height="35" fill="white" stroke="#ccc" stroke-width="1" rx="3" ry="3"/>
+  <text x="685" y="168" font-family="Arial" font-size="14" fill="#333">Semua Kelas</text>
+  <polygon points="830,160 850,150 850,170" fill="#666"/>
+
+  <rect x="900" y="145" width="120" height="35" fill="#3f51b5" rx="3" ry="3"/>
+  <text x="930" y="168" font-family="Arial" font-size="14" fill="white">Filter</text>
+
+  <!-- Action Buttons -->
+  <rect x="280" y="215" width="150" height="40" fill="#4caf50" rx="3" ry="3"/>
+  <text x="315" y="240" font-family="Arial" font-size="14" fill="white">+ Tambah Data</text>
+
+  <rect x="440" y="215" width="150" height="40" fill="#ff9800" rx="3" ry="3"/>
+  <text x="483" y="240" font-family="Arial" font-size="14" fill="white">Export</text>
+
+  <!-- Table Header -->
+  <rect x="280" y="270" width="910" height="50" fill="#e8eaf6"/>
+  <text x="300" y="300" font-family="Arial" font-size="14" fill="#333" font-weight="bold">No</text>
+  <text x="360" y="300" font-family="Arial" font-size="14" fill="#333" font-weight="bold">NIS</text>
+  <text x="470" y="300" font-family="Arial" font-size="14" fill="#333" font-weight="bold">Nama Siswa</text>
+  <text x="640" y="300" font-family="Arial" font-size="14" fill="#333" font-weight="bold">Kelas</text>
+  <text x="740" y="300" font-family="Arial" font-size="14" fill="#333" font-weight="bold">Tahun Ajaran</text>
+  <text x="890" y="300" font-family="Arial" font-size="14" fill="#333" font-weight="bold">Status</text>
+  <text x="1010" y="300" font-family="Arial" font-size="14" fill="#333" font-weight="bold">Aksi</text>
+
+  <!-- Table Rows -->
+  <!-- Row 1 -->
+  <rect x="280" y="320" width="910" height="50" fill="white" stroke="#eee" stroke-width="1"/>
+  <text x="300" y="350" font-family="Arial" font-size="14" fill="#333">1</text>
+  <text x="360" y="350" font-family="Arial" font-size="14" fill="#333">2025001</text>
+  <text x="470" y="350" font-family="Arial" font-size="14" fill="#333">Ahmad Fadli</text>
+  <text x="640" y="350" font-family="Arial" font-size="14" fill="#333">1A</text>
+  <text x="740" y="350" font-family="Arial" font-size="14" fill="#333">2024/2025</text>
+
+  <rect x="890" y="335" width="70" height="25" fill="#4caf50" rx="3" ry="3" opacity="0.2"/>
+  <text x="905" y="352" font-family="Arial" font-size="13" fill="#4caf50" font-weight="bold">Aktif</text>
+
+  <rect x="980" y="335" width="55" height="25" fill="#2196f3" rx="3" ry="3"/>
+  <text x="993" y="352" font-family="Arial" font-size="12" fill="white">Edit</text>
+
+  <rect x="1045" y="335" width="70" height="25" fill="#f44336" rx="3" ry="3"/>
+  <text x="1055" y="352" font-family="Arial" font-size="12" fill="white">Hapus</text>
+
+  <!-- Row 2 -->
+  <rect x="280" y="370" width="910" height="50" fill="#fafafa" stroke="#eee" stroke-width="1"/>
+  <text x="300" y="400" font-family="Arial" font-size="14" fill="#333">2</text>
+  <text x="360" y="400" font-family="Arial" font-size="14" fill="#333">2025002</text>
+  <text x="470" y="400" font-family="Arial" font-size="14" fill="#333">Budi Santoso</text>
+  <text x="640" y="400" font-family="Arial" font-size="14" fill="#333">1A</text>
+  <text x="740" y="400" font-family="Arial" font-size="14" fill="#333">2024/2025</text>
+
+  <rect x="890" y="385" width="70" height="25" fill="#4caf50" rx="3" ry="3" opacity="0.2"/>
+  <text x="905" y="402" font-family="Arial" font-size="13" fill="#4caf50" font-weight="bold">Aktif</text>
+
+  <rect x="980" y="385" width="55" height="25" fill="#2196f3" rx="3" ry="3"/>
+  <text x="993" y="402" font-family="Arial" font-size="12" fill="white">Edit</text>
+
+  <rect x="1045" y="385" width="70" height="25" fill="#f44336" rx="3" ry="3"/>
+  <text x="1055" y="402" font-family="Arial" font-size="12" fill="white">Hapus</text>
+
+  <!-- Row 3 -->
+  <rect x="280" y="420" width="910" height="50" fill="white" stroke="#eee" stroke-width="1"/>
+  <text x="300" y="450" font-family="Arial" font-size="14" fill="#333">3</text>
+  <text x="360" y="450" font-family="Arial" font-size="14" fill="#333">2025003</text>
+  <text x="470" y="450" font-family="Arial" font-size="14" fill="#333">Cindy Paramitha</text>
+  <text x="640" y="450" font-family="Arial" font-size="14" fill="#333">1B</text>
+  <text x="740" y="450" font-family="Arial" font-size="14" fill="#333">2024/2025</text>
+
+  <rect x="890" y="435" width="70" height="25" fill="#4caf50" rx="3" ry="3" opacity="0.2"/>
+  <text x="905" y="452" font-family="Arial" font-size="13" fill="#4caf50" font-weight="bold">Aktif</text>
+
+  <rect x="980" y="435" width="55" height="25" fill="#2196f3" rx="3" ry="3"/>
+  <text x="993" y="452" font-family="Arial" font-size="12" fill="white">Edit</text>
+
+  <rect x="1045" y="435" width="70" height="25" fill="#f44336" rx="3" ry="3"/>
+  <text x="1055" y="452" font-family="Arial" font-size="12" fill="white">Hapus</text>
+
+  <!-- Row 4 -->
+  <rect x="280" y="470" width="910" height="50" fill="#fafafa" stroke="#eee" stroke-width="1"/>
+  <text x="300" y="500" font-family="Arial" font-size="14" fill="#333">4</text>
+  <text x="360" y="500" font-family="Arial" font-size="14" fill="#333">2025004</text>
+  <text x="470" y="500" font-family="Arial" font-size="14" fill="#333">Dewi Lestari</text>
+  <text x="640" y="500" font-family="Arial" font-size="14" fill="#333">1B</text>
+  <text x="740" y="500" font-family="Arial" font-size="14" fill="#333">2024/2025</text>
+
+  <rect x="890" y="485" width="95" height="25" fill="#f44336" rx="3" ry="3" opacity="0.2"/>
+  <text x="900" y="502" font-family="Arial" font-size="13" fill="#f44336" font-weight="bold">Nonaktif</text>
+
+  <rect x="980" y="485" width="55" height="25" fill="#2196f3" rx="3" ry="3"/>
+  <text x="993" y="502" font-family="Arial" font-size="12" fill="white">Edit</text>
+
+  <rect x="1045" y="485" width="70" height="25" fill="#f44336" rx="3" ry="3"/>
+  <text x="1055" y="502" font-family="Arial" font-size="12" fill="white">Hapus</text>
+
+  <!-- Row 5 -->
+  <rect x="280" y="520" width="910" height="50" fill="white" stroke="#eee" stroke-width="1"/>
+  <text x="300" y="550" font-family="Arial" font-size="14" fill="#333">5</text>
+  <text x="360" y="550" font-family="Arial" font-size="14" fill="#333">2024001</text>
+  <text x="470" y="550" font-family="Arial" font-size="14" fill="#333">Eko Prasetyo</text>
+  <text x="640" y="550" font-family="Arial" font-size="14" fill="#333">2A</text>
+  <text x="740" y="550" font-family="Arial" font-size="14" fill="#333">2024/2025</text>
+
+  <rect x="890" y="535" width="70" height="25" fill="#4caf50" rx="3" ry="3" opacity="0.2"/>
+  <text x="905" y="552" font-family="Arial" font-size="13" fill="#4caf50" font-weight="bold">Aktif</text>
+
+  <rect x="980" y="535" width="55" height="25" fill="#2196f3" rx="3" ry="3"/>
+  <text x="993" y="552" font-family="Arial" font-size="12" fill="white">Edit</text>
+
+  <rect x="1045" y="535" width="70" height="25" fill="#f44336" rx="3" ry="3"/>
+  <text x="1055" y="552" font-family="Arial" font-size="12" fill="white">Hapus</text>
+
+  <!-- Pagination -->
+  <rect x="280" y="600" width="910" height="50" fill="white"/>
+  <text x="280" y="630" font-family="Arial" font-size="14" fill="#666">Menampilkan 1-5 dari 24 data</text>
+
+  <rect x="780" y="610" width="40" height="35" fill="#fafafa" stroke="#ddd" stroke-width="1" rx="3" ry="3"/>
+  <text x="795" y="632" font-family="Arial" font-size="14" fill="#333">1</text>
+
+  <rect x="830" y="610" width="40" height="35" fill="white" stroke="#ddd" stroke-width="1" rx="3" ry="3"/>
+  <text x="845" y="632" font-family="Arial" font-size="14" fill="#666">2</text>
+
+  <rect x="880" y="610" width="40" height="35" fill="white" stroke="#ddd" stroke-width="1" rx="3" ry="3"/>
+  <text x="895" y="632" font-family="Arial" font-size="14" fill="#666">3</text>
+
+  <rect x="930" y="610" width="40" height="35" fill="white" stroke="#ddd" stroke-width="1" rx="3" ry="3"/>
+  <text x="945" y="632" font-family="Arial" font-size="14" fill="#666">4</text>
+
+  <rect x="980" y="610" width="40" height="35" fill="white" stroke="#ddd" stroke-width="1" rx="3" ry="3"/>
+  <text x="995" y="632" font-family="Arial" font-size="14" fill="#666">5</text>
+
+  <rect x="1030" y="610" width="90" height="35" fill="white" stroke="#ddd" stroke-width="1" rx="3" ry="3"/>
+  <text x="1050" y="632" font-family="Arial" font-size="14" fill="#666">Next »</text>
+
+  <!-- Modal for Add/Edit -->
+  <!-- <rect x="300" y="150" width="600" height="500" fill="rgba(0,0,0,0.5)" rx="5" ry="5"/>
+  <rect x="350" y="200" width="500" height="400" fill="white" rx="5" ry="5"/>
+
+  <text x="380" y="240" font-family="Arial" font-size="18" fill="#333" font-weight="bold">Tambah Siswa ke Kelas</text>
+
+  <line x1="350" y1="260" x2="850" y2="260" stroke="#eee" stroke-width="2"/>
+
+  <text x="380" y="290" font-family="Arial" font-size="14" fill="#666">Tahun Ajaran:</text>
+  <rect x="380" y="300" width="440" height="35" fill="white" stroke="#ccc" stroke-width="1" rx="3" ry="3"/>
+
+  <text x="380" y="360" font-family="Arial" font-size="14" fill="#666">Siswa:</text>
+  <rect x="380" y="370" width="440" height="35" fill="white" stroke="#ccc" stroke-width="1" rx="3" ry="3"/>
+
+  <text x="380" y="430" font-family="Arial" font-size="14" fill="#666">Kelas:</text>
+  <rect x="380" y="440" width="440" height="35" fill="white" stroke="#ccc" stroke-width="1" rx="3" ry="3"/>
+
+  <text x="380" y="500" font-family="Arial" font-size="14" fill="#666">Status:</text>
+  <rect x="380" y="510" width="440" height="35" fill="white" stroke="#ccc" stroke-width="1" rx="3" ry="3"/>
+
+  <rect x="530" y="560" width="90" height="35" fill="#f44336" rx="3" ry="3"/>
+  <text x="550" y="582" font-family="Arial" font-size="14" fill="white">Batal</text>
+
+  <rect x="630" y="560" width="100" height="35" fill="#4caf50" rx="3" ry="3"/>
+  <text x="650" y="582" font-family="Arial" font-size="14" fill="white">Simpan</text> -->
+</svg>
