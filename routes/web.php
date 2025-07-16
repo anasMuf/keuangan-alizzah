@@ -114,6 +114,9 @@ Route::middleware('auth')->group(function(){
     // KESISWAAN START
     Route::prefix('/siswa-kelas')->as('siswa_kelas')->controller(SiswaKelasController::class)->group(function(){
         Route::get('/siswa','byKelas')->name('.byKelas');
+        Route::get('/tanpa-kelas','getSiswaTanpaKelas')->name('.getSiswaTanpaKelas');
+        Route::post('/store/from-kelas','storeFromKelas')->name('.storeFromKelas');
+        Route::delete('/delete/{id}','delete')->name('.delete');
     });
 
     Route::prefix('/siswa-naik-kelas')->as('siswa_naik_kelas')->controller(SiswaNaikKelasController::class)->group(function(){

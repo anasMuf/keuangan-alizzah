@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SIAKAD\Siswa;
 use App\Helpers\LogPretty;
 use App\Imports\SiswaImport;
+use App\Models\SIAKAD\Kelas;
+use App\Models\SIAKAD\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Validator;
 
 class SiswaController extends Controller
 {
-    public function index(){
+    public function index(Request $request){
         $data['heads'] = [
             ['label' => 'No', 'width' => 4],
             'Nama Lengkap',
@@ -23,6 +24,9 @@ class SiswaController extends Controller
 
         $siswa =  Siswa::with('siswa_kelas.kelas')
         ->whereHas('siswa_kelas', fn($q)=>$q->where('status', 'aktif'))
+        ->when($request->kelas_id, function($q) use ($request) {
+            $q->whereHas('siswa_kelas.kelas', fn($q) => $q->where('id', $request->kelas_id));
+        })
         ->get();
 
         $data['config'] = [
@@ -52,6 +56,8 @@ class SiswaController extends Controller
             ];
         }
 
+        $data['kelas'] = Kelas::select('nama_kelas', 'id')->get();
+
         return view('pages.siswa.index', $data);
     }
 
@@ -64,6 +70,10 @@ class SiswaController extends Controller
             $jenisKelaminSelected = $data['data']->jenis_kelamin;
         }
         $data['jenisKelaminSelected'] = $jenisKelaminSelected;
+
+        if(isset($request->kelas_id)){
+            $data['kelas'] = $request->kelas_id;
+        }
 
         return view('pages.siswa.form',$data);
     }

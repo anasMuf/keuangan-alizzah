@@ -25,7 +25,7 @@ class SiswaPindahKelasController extends Controller
         }
         $data['tahun_ajaran'] = $resultTahunAjaran;
 
-        $tahunAjaranAktif = TahunAjaran::whereDate('tanggal_mulai','<',date('Y-m-d'))->first() ?? TahunAjaran::orderBy('tanggal_mulai','asc')->first();
+        $tahunAjaranAktif = TahunAjaran::where('is_aktif',true)->first();
         $data['tahunAjaranAwal'] = $tahunAjaranAktif->id;
         $data['tahunAjaranTujuan'] = $tahunAjaranAktif->id;
         $data['siswa'] = Siswa::get();

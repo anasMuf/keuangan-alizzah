@@ -113,7 +113,7 @@ class SiswaDispensasiController extends Controller
     }
 
     public function form(Request $request){
-        if(!$request->id){
+        if(isset($request->siswa_id) && !$request->siswa_id){
             return redirect()->route('siswa.main')->with('warning', 'Jika ingin menambahkan siswa dispensasi, tambahkan siswa atau pilih siswa terlebih dahulu disini');
         }
         $data['data'] = ($request->id) ? SiswaDispensasi::find($request->id) : [];

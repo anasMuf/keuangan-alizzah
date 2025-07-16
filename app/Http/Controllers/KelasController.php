@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SIAKAD\Kelas;
 use App\Helpers\LogPretty;
-use App\Models\SIAKAD\Jenjang;
+use App\Models\SIAKAD\Kelas;
+use App\Models\SIAKAD\Siswa;
 use Illuminate\Http\Request;
+use App\Models\SIAKAD\Jenjang;
+use App\Models\SIAKAD\SiswaKelas;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -56,6 +58,7 @@ class KelasController extends Controller
             $result[$item['id']] = $item['nama_jenjang'];
         }
         $data['jenjang'] = $result;
+        $data['dataSiswa'] = ($request->id) ? SiswaKelas::where('kelas_id',$request->id)->get() : [];
         return view('pages.kelas.form',$data);
     }
 

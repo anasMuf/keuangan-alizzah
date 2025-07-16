@@ -108,7 +108,12 @@
     @endif
 </x-adminlte-card>
 @stop
-
+@php
+    $kelasId = null;
+    if(isset($kelas)){
+        $kelasId = $kelas;
+    }
+@endphp
 {{-- Push extra CSS --}}
 
 @push('css')
@@ -142,13 +147,21 @@
         })
     </script>
     <script>
+        let routeStore = "{{ route('siswa.store') }}";
+        let locationAfterStore = "{{ route('siswa.main') }}";
+        let kelasId = "{{ $kelasId }}";
+        if(kelasId){
+            routeStore = `/siswa-kelas/store/from-kelas?kelas_id=${kelasId}`;
+            locationAfterStore = `/kelas/form?id=${kelasId}`;
+        }
+
         $('#formData').submit(function (e) {
             e.preventDefault();
             if(!validationNoKTP()){
-                return Swal.fire('Peringatan','no ktp tidak sesuai','warning')
+                // return Swal.fire('Peringatan','no ktp tidak sesuai','warning')
             }
             const data = $('#formData').serialize()
-            $.post("{{ route('siswa.store') }}", data)
+            $.post(routeStore, data)
             .done(function (response) {
                 if(response.success){
                     let timer = 1500
@@ -160,7 +173,7 @@
                         timer: timer
                     })
                     setTimeout(() => {
-                        location.href = "{{ route('siswa.main') }}"
+                        location.href = locationAfterStore
                     }, timer);
                 }else{
                     let message = response.message;

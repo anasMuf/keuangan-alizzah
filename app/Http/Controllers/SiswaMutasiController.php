@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\LogPretty;
 use App\Models\SIAKAD\Kelas;
 use App\Models\SIAKAD\Siswa;
-use App\Helpers\LogPretty;
+use Illuminate\Http\Request;
 use App\Models\SIAKAD\SiswaKelas;
 use App\Models\SIAKAD\TahunAjaran;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\TagihanSiswaService;
 use Illuminate\Support\Facades\Validator;
 
 class SiswaMutasiController extends Controller
@@ -25,7 +26,7 @@ class SiswaMutasiController extends Controller
         }
         $data['tahun_ajaran'] = $resultTahunAjaran;
 
-        $tahunAjaranAktif = TahunAjaran::whereDate('tanggal_mulai','<',date('Y-m-d'))->first() ?? TahunAjaran::orderBy('tanggal_mulai','asc')->first();
+        $tahunAjaranAktif = TahunAjaran::where('is_aktif',true)->first();
         $data['tahunAjaranAwal'] = $tahunAjaranAktif->id;
         $data['tahunAjaranTujuan'] = $tahunAjaranAktif->id;
         $data['siswa'] = Siswa::has('siswa_kelas', '=', 0)->get();
@@ -85,6 +86,22 @@ class SiswaMutasiController extends Controller
                 $siswa_kelas->asal_sekolah = $request->asal_sekolah;
                 $siswa_kelas->status = 'aktif';
                 $siswa_kelas->save();
+
+                // buat tagihan siswa
+                $tagihanSiswaService = new TagihanSiswaService();
+                $dataTagihan = [
+                    'tahun_ajaran_id' => $request->tahun_ajaran_tujuan,
+                    'siswa_kelas' => SiswaKelas::with('kelas.jenjang','siswa.siswa_dispensasi')->find($siswa_kelas->id)->toArray(),
+                    'siswa_dispensasi' => $siswa_kelas['siswa']['siswa_dispensasi'] ?? [],
+                ];
+                $resultTagihan = $tagihanSiswaService->create($dataTagihan);
+                if(!$resultTagihan['success']) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => $resultTagihan['message'],
+                    ]);
+                }
             }
 
             DB::commit();

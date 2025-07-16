@@ -28,9 +28,9 @@ class SiswaNaikKelasController extends Controller
         }
         $data['tahun_ajaran'] = $resultTahunAjaran;
 
-        $tahunAjaranAktif = TahunAjaran::whereDate('tanggal_mulai','<',date('Y-m-d'))->first() ?? TahunAjaran::orderBy('tanggal_mulai','asc')->first();
-        $data['tahunAjaranAwal'] = $tahunAjaranAktif->id;
-        $data['tahunAjaranTujuan'] = TahunAjaran::whereDate('tanggal_mulai','>',$tahunAjaranAktif->tanggal_selesai)->orderBy('tanggal_mulai','desc')->first()->id;
+        // $tahunAjaranAktif = TahunAjaran::whereDate('tanggal_mulai','<',date('Y-m-d'))->first() ?? TahunAjaran::orderBy('tanggal_mulai','asc')->first();
+        $data['tahunAjaranAwal'] = '';//$tahunAjaranAktif->id;
+        $data['tahunAjaranTujuan'] = '';//TahunAjaran::whereDate('tanggal_mulai','>',$tahunAjaranAktif->tanggal_selesai)->orderBy('tanggal_mulai','desc')->first()->id;
         $data['siswa'] = Siswa::get();
 
         return view('pages.siswa_naik_kelas.index',$data);
@@ -92,7 +92,7 @@ class SiswaNaikKelasController extends Controller
                 $tagihanSiswaService = new TagihanSiswaService();
                 $dataTagihan = [
                     'tahun_ajaran_id' => $request->tahun_ajaran_tujuan,
-                    'siswa_kelas' => SiswaKelas::find($siswa_kelas->id)->with('siswa.siswa_dispensasi')->toArray(),
+                    'siswa_kelas' => SiswaKelas::with('kelas.jenjang','siswa.siswa_dispensasi')->find($siswa_kelas->id)->toArray(),
                     'siswa_dispensasi' => $siswa_kelas['siswa']['siswa_dispensasi'] ?? [],
                 ];
                 $resultTagihan = $tagihanSiswaService->create($dataTagihan);

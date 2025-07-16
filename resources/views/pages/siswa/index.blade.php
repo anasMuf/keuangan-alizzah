@@ -35,11 +35,26 @@
         </div>
     @endif
 
-    <div class="action mb-3">
-        <a href="{{ route('siswa.form') }}" class="btn btn-primary">Tambah</a>
-        <a href="{{ route('siswa.import.form') }}" class="btn btn-success">Import Excel</a>
-        {{-- generate tagihan siswa --}}
-        <a href="{{ route('tagihan.generate') }}" class="btn btn-warning">Generate Tagihan Siswa</a>
+    <div class="action mb-3 d-flex justify-content-between">
+        <div class="action-list">
+            <a href="{{ route('siswa.form') }}" class="btn btn-primary">Tambah</a>
+            <a href="{{ route('siswa.import.form') }}" class="btn btn-success">Import Excel</a>
+            {{-- generate tagihan siswa --}}
+            <a href="{{ route('tagihan.generate') }}" class="btn btn-warning">Generate Tagihan Siswa</a>
+        </div>
+        <div class="filter">
+            <form action="{{ route('siswa.main') }}" method="get" class="form-inline" id="filter">
+                <div class="form-group">
+                    <label for="kelas_id" class="mr-2">Kelas:</label>
+                    <select name="kelas_id" id="kelas_id" class="form-control">
+                        <option value="">Semua Kelas</option>
+                        @foreach($kelas as $k)
+                            <option value="{{ $k->id }}" {{ request('kelas_id') == $k->id ? 'selected' : '' }}>{{ $k->nama_kelas }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </form>
+        </div>
     </div>
     <x-adminlte-datatable id="table1" :heads="$heads" :config="$config">
         @foreach($config['data'] as $row)
@@ -64,6 +79,8 @@
 
 @push('js')
     <script>
+        $('#kelas_id').change(() => $('#filter').submit())
+
         function deleteData(id,nama){
             Swal.fire({
                 title: "Data akan dihapus!",
