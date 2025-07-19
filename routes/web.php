@@ -162,8 +162,13 @@ Route::middleware('auth')->group(function(){
         Route::post('/store','store')->name('.store');
         Route::delete('/delete/{id}','delete')->name('.delete');
 
-        Route::get('/setting-nominal-bulan', 'settingNominalBulan')->name('.setting_nominal_bulan');
-        Route::post('/store-nominal-bulan', 'storeNominalBulan')->name('.store_nominal_bulan');
+        Route::get('/form-jenjang-pos-pemasukan-detail', 'formJenjangPosPemasukanDetail')->name('.formJenjangPosPemasukanDetail');
+        Route::post('/store-jenjang-pos-pemasukan-detail', 'storeJenjangPosPemasukanDetail')->name('.storeJenjangPosPemasukanDetail');
+
+        Route::get('/form-jenjang-pos-pemasukan-nominal', 'formJenjangPosPemasukanNominal')->name('.formJenjangPosPemasukanNominal');
+        Route::put('/update-jenjang-pos-pemasukan-nominal', 'updateJenjangPosPemasukanNominal')->name('.updateJenjangPosPemasukanNominal');
+
+        Route::put('/sync-tagihan', 'syncPosPemasukanTagihanSiswa')->name('.syncPosPemasukanTagihanSiswa');
     });
 
     Route::prefix('/pos_pengeluaran')->as('pos_pengeluaran')->controller(PosPengeluaranController::class)->group(function(){

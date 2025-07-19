@@ -13,6 +13,8 @@ use App\Models\SIAKAD\TahunAjaran;
 use Illuminate\Support\Facades\DB;
 use App\Models\JenjangPosPemasukan;
 use Illuminate\Support\Facades\Log;
+use App\Models\JenjangPosPemasukanDetail;
+use App\Models\JenjangPosPemasukanNominal;
 use Illuminate\Support\Facades\Validator;
 
 class PosPemasukanController extends Controller
@@ -29,8 +31,11 @@ class PosPemasukanController extends Controller
         ];
 
         $pos_pemasukan =  PosPemasukan::
-        with('jenjang_pos_pemasukan.jenjang','jenjang_pos_pemasukan.tahun_ajaran')->
-        get();
+        with(
+            'jenjang_pos_pemasukan.jenjang',
+            'jenjang_pos_pemasukan.tahun_ajaran',
+            'jenjang_pos_pemasukan.jenjang_pos_pemasukan_detail.jenjang_pos_pemasukan_nominal'
+        )->get();
 
         $data['config'] = [
             'data' => [],
@@ -49,6 +54,7 @@ class PosPemasukanController extends Controller
         $btnDetails = '';
         $jenjang = '';
         $tahun_ajaran = '';
+        $nominal = '';
         $no = 1;
 
         foreach($pos_pemasukan as $item){
@@ -67,13 +73,22 @@ class PosPemasukanController extends Controller
             }
             $jenjang .= '</ul>';
 
+            $nominal = 'Rp '.number_format($item->nominal_valid,0,',','.');
+            if($item->is_nominal_varian){
+                $nominal = "lihat detail";
+            }
+
+            if($item->tabungan && !$item->wajib){
+                $nominal = 'nominal menyesuaikan';
+            }
+
             $data['config']['data'][] = [
                 $no++,
                 // $tahun_ajaran,
                 $item->nama_pos_pemasukan,
                 $item->pembayaran,
                 $jenjang,
-                'Rp '.number_format($item->nominal_valid,0,',','.'),
+                $nominal,
                 '<nobr>'.$btnDelete.$btnDetails.'</nobr>'
             ];
         }
@@ -82,7 +97,11 @@ class PosPemasukanController extends Controller
     }
 
     public function form(Request $request){
-        $data['data'] = ($request->id) ? PosPemasukan::with('jenjang_pos_pemasukan.jenjang','jenjang_pos_pemasukan.tahun_ajaran')->find($request->id) : [];
+        $data['data'] = ($request->id) ? PosPemasukan::with(
+            'jenjang_pos_pemasukan.jenjang',
+            'jenjang_pos_pemasukan.tahun_ajaran',
+            'jenjang_pos_pemasukan.jenjang_pos_pemasukan_detail.jenjang_pos_pemasukan_nominal.bulan'
+        )->find($request->id) : [];
 
         $resultPos = [];
         foreach (Pos::get()->toArray() as $item) {
@@ -136,6 +155,7 @@ class PosPemasukanController extends Controller
             "width" => '100%'
         ];
 
+        // return $data['data'];
         return view('pages.pos_pemasukan.form',$data);
     }
 
@@ -253,10 +273,27 @@ class PosPemasukanController extends Controller
         }
     }
 
-    public function settingNominalBulan(Request $request)
-    {
-        $data['tagihanBulan'] = TagihanSiswa::select('id','bulan_id','nominal')->with('bulan:id,nama_bulan')->where('pos_pemasukan_id', $request->id_pos_pemasukan)->groupBy('bulan_id')->get();
-        $result = view('pages.pos_pemasukan.modal', $data)->render();
+    public function formJenjangPosPemasukanDetail(Request $request){
+        $data['data'] = [];
+
+        $data['jenisKelamin'] = ['Laki-laki'=>'Laki-laki','Perempuan'=>'Perempuan'];
+        $jenisKelaminSelected = '';
+        if($data['data']){
+            $jenisKelaminSelected = $data['data']->jenis_kelamin;
+        }
+        $data['jenisKelaminSelected'] = $jenisKelaminSelected;
+
+        $data['pos_pemasukan'] = PosPemasukan::with([
+            'jenjang_pos_pemasukan' => function($query) use ($request){
+                $query->where('id',$request->jenjang_pos_pemasukan_id);
+            },
+            'jenjang_pos_pemasukan.jenjang'
+        ])
+        ->findOrFail($request->pos_pemasukan_id);
+        $data['bulan'] = Bulan::get();
+
+        $result = view('pages.pos_pemasukan.modal_jenjang_pos_pemasukan_detail',$data)->render();
+
         return response()->json([
             'success' => true,
             'message' => 'Berhasil mendapatkan data',
@@ -264,29 +301,35 @@ class PosPemasukanController extends Controller
         ]);
     }
 
-    public function storeNominalBulan(Request $request)
-    {
+    public function storeJenjangPosPemasukanDetail(Request $request){
         $rules = [
-            'id_pos_pemasukan' => 'required|exists:pos_pemasukan,id',
-            'bulan_id' => 'required|array',
-            'nominal_bulan' => 'required|array',
-            'nominal_bulan.*' => 'numeric|min:0',
+            'id_pos_pemasukan' => 'required',
+            'is_nominal_bulanan' => 'required',
+            'jenis_kelamin' => 'nullable',
+            'jenjang_pos_pemasukan_id' => 'required',
+            'nominal_valid' => 'nullable|numeric|min:0',
+            'bulan' => 'nullable|array',
+            'bulan.*.id' => 'nullable',
+            'bulan.*.nominal' => 'nullable|numeric|min:0',
         ];
         $messages = [
             'required' => ':attribute harus diisi',
             'exists' => ':attribute tidak ditemukan',
-            'numeric' => ':attribute harus berupa angka',
-            'min' => ':attribute tidak boleh kurang dari 0',
         ];
         $attributes = [
             'id_pos_pemasukan' => 'Pos Pemasukan',
-            'bulan_id' => 'Bulan',
-            'nominal_bulan' => 'Nominal Bulan',
+            'is_nominal_bulanan' => 'Nominal Bulanan',
+            'jenis_kelamin' => 'Jenis Kelamin',
+            'jenjang_pos_pemasukan_id' => 'Jenjang Pos Pemasukan',
+            'nominal_valid' => 'Nominal Valid',
+            'bulan' => 'Bulan',
+            'bulan.*.id' => 'ID Bulan',
+            'bulan.*.nominal' => 'Nominal Bulan',
         ];
 
-        $validator = Validator::make($request->all(), $rules, $messages, $attributes);
+        $validator = Validator::make($request->all(),$rules,$messages,$attributes);
 
-        if ($validator->fails()) {
+        if($validator->fails()){
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyimpan data, ',
@@ -296,16 +339,30 @@ class PosPemasukanController extends Controller
 
         DB::beginTransaction();
         try {
-            foreach ($request->bulan_id as $index => $bulanId) {
-                TagihanSiswa::where([
-                    ['tahun_ajaran_id', TahunAjaran::where('is_aktif', true)->first()->id],
-                    ['bulan_id', $bulanId],
-                    ['pos_pemasukan_id', $request->id_pos_pemasukan],
-                ])->update([
-                    'nominal_awal' => $request->nominal_bulan[$index],
-                    'nominal' => $request->nominal_bulan[$index],
-                ]);
+
+            // simpan jenjang pos pemasukan detail
+            $jenjangPosPemasukanDetail = JenjangPosPemasukanDetail::create(
+                [
+                    'jenjang_pos_pemasukan_id' => $request->jenjang_pos_pemasukan_id,
+                    'jenis_kelamin' => $request->jenis_kelamin,
+                    'nominal_valid' => $request->nominal_valid??0,
+                    'is_nominal_bulan' => $request->is_nominal_bulanan == 'bulanan' ? true : false
+                ]
+            );
+
+            if($request->is_nominal_bulanan == 'bulanan'){
+                // simpan nominal bulanan
+                foreach ($request->bulan as $item) {
+                    JenjangPosPemasukanNominal::create([
+                        'jenjang_pos_pemasukan_detail_id' => $jenjangPosPemasukanDetail->id,
+                        'bulan_id' => $item['id'],
+                        'nominal' => $item['nominal'],
+                    ]);
+                }
             }
+
+
+
 
             DB::commit();
             return response()->json([
@@ -318,6 +375,176 @@ class PosPemasukanController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyimpan data, kesalahan pada sistem',
+            ]);
+        }
+    }
+
+    public function formJenjangPosPemasukanNominal(Request $request){
+        $data['data'] = JenjangPosPemasukanNominal::find($request->jenjang_pos_pemasukan_nominal_id);
+        $result = view('pages.pos_pemasukan.modal_jenjang_pos_pemasukan_nominal',$data)->render();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil mendapatkan data',
+            'result' => $result,
+        ]);
+    }
+
+    public function updateJenjangPosPemasukanNominal(Request $request){
+        $rules = [
+            'jenjang_pos_pemasukan_nominal_id' => 'required|exists:jenjang_pos_pemasukan_nominal,id',
+            'nominal' => 'required|numeric|min:0',
+        ];
+        $messages = [
+            'required' => ':attribute harus diisi',
+            'exists' => ':attribute tidak ditemukan',
+        ];
+        $attributes = [
+            'jenjang_pos_pemasukan_nominal_id' => 'ID',
+            'nominal' => 'Nominal',
+        ];
+
+        $validator = Validator::make($request->all(),$rules,$messages,$attributes);
+
+        if($validator->fails()){
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui data, ',
+                'message_validation' => $validator->getMessageBag()
+            ]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $jenjangPosPemasukanNominal = JenjangPosPemasukanNominal::find($request->jenjang_pos_pemasukan_nominal_id);
+            if(!$jenjangPosPemasukanNominal){
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal memperbarui data, data tidak ditemukan',
+                ]);
+            }
+
+            $jenjangPosPemasukanNominal->update([
+                'nominal' => $request->nominal,
+            ]);
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil memperbarui data',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            LogPretty::error($th);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui data, kesalahan pada sistem',
+            ]);
+        }
+    }
+
+    public function syncPosPemasukanTagihanSiswa(Request $request){
+        $rules = [
+            'pos_pemasukan_id' => 'required',
+        ];
+        $messages = [
+            'required' => ':attribute harus diisi',
+        ];
+        $attributes = [
+            'pos_pemasukan_id' => 'ID',
+        ];
+
+        $validator = Validator::make($request->all(),$rules,$messages,$attributes);
+
+        if($validator->fails()){
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui data, ',
+                'message_validation' => $validator->getMessageBag()
+            ]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $tahunAjaran = TahunAjaran::where('is_aktif',true)->first();
+            if(!$tahunAjaran){
+                return response()->json([
+                    'success' => false,
+                    'message' => 'tahun ajaran tidak tersedia',
+                ]);
+            }
+            //cek tagihan siswa sesuai pos_pemasukan_id
+            $tagihanSiswa = TagihanSiswa::select('id','tahun_ajaran_id','bulan_id','siswa_kelas_id','pos_pemasukan_id','nominal_awal','siswa_dispensasi_id','diskon_persen','diskon_nominal','nominal')
+            ->with([
+                'siswa_kelas.siswa:id,jenis_kelamin',
+                'siswa_kelas.kelas:id,nama_kelas,jenjang_id',
+                'siswa_kelas.kelas.jenjang:id,nama_jenjang',
+                'pos_pemasukan.jenjang_pos_pemasukan.jenjang_pos_pemasukan_detail.jenjang_pos_pemasukan_nominal',
+            ])
+            ->where('pos_pemasukan_id', $request->pos_pemasukan_id)
+            ->where('tahun_ajaran_id', $tahunAjaran->id)
+            ->get();
+            if(!$tagihanSiswa){
+                return response()->json([
+                    'success' => true,
+                    'message' => 'tidak ada tagihan, tidak ada yang perlu diupdate',
+                ]);
+            }
+
+            foreach($tagihanSiswa as $value){
+                $jenisKelaminSiswa = $value->siswa_kelas->siswa->jenisKelamin;
+                $jenjangIdSiswa = $value->siswa_kelas->kelas->jenjang->id;
+                $nominalPosPemaukanUntukTagihanSiswa = 0;
+                $totalNominal = 0;
+
+                foreach($value->pos_pemasukan->jenjang_pos_pemasukan as $jenjang_pos_pemasukan){
+                    if($jenjang_pos_pemasukan->jenjang_id == $jenjangIdSiswa){
+                        if($jenjang_pos_pemasukan->jenjang_pos_pemasukan_detail){
+                            foreach($jenjang_pos_pemasukan->jenjang_pos_pemasukan_detail as $jenjang_pos_pemasukan_detail){
+                                if($jenjang_pos_pemasukan_detail->jenis_kelamin && $jenjang_pos_pemasukan_detail->jenis_kelamin == $jenisKelaminSiswa){
+                                    $nominalPosPemaukanUntukTagihanSiswa = $jenjang_pos_pemasukan_detail->nominal;
+                                }
+                                if($jenjang_pos_pemasukan_detail->is_nominal_bulan){
+                                    foreach($jenjang_pos_pemasukan_detail->jenjang_pos_pemasukan_nominal as $jenjang_pos_pemasukan_nominal){
+                                        if($jenjang_pos_pemasukan_nominal->bulan_id == $value->bulan_id){
+                                            $nominalPosPemaukanUntukTagihanSiswa = $jenjang_pos_pemasukan_nominal->nominal;
+                                        }
+                                    }
+                                }else{
+                                    $nominalPosPemaukanUntukTagihanSiswa = $jenjang_pos_pemasukan_detail->nominal;
+                                }
+
+                            }
+                        }
+                    }
+                }
+                $diskon_persen = $value->diskon_persen ?? 0;
+                $diskon_nominal = $value->diskon_nominal ?? 0;
+                if($diskon_persen > 0){
+                    $totalNominal = $nominalPosPemaukanUntukTagihanSiswa - ($nominalPosPemaukanUntukTagihanSiswa * ($diskon_persen / 100));
+                }elseif($diskon_nominal > 0){
+                    $totalNominal = $nominalPosPemaukanUntukTagihanSiswa - $diskon_nominal;
+                }else{
+                    $totalNominal = $nominalPosPemaukanUntukTagihanSiswa;
+                }
+
+                $value->update([
+                    'nominal_awal' => $nominalPosPemaukanUntukTagihanSiswa,
+                    'nominal' => $totalNominal
+                ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil sinkron data dengan tagihan siswa',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            LogPretty::error($th);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui data, kesalahan pada sistem',
             ]);
         }
     }

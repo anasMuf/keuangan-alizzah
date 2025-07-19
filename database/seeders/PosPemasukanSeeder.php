@@ -27,6 +27,7 @@ class PosPemasukanSeeder extends Seeder
                 'pembayaran' => 'tahunan',
                 'wajib' => true,
                 'nominal_valid' => 0,
+                'is_nominal_varian' => true
             ],
 
 
@@ -46,6 +47,7 @@ class PosPemasukanSeeder extends Seeder
                 'hari_aktif' => true,
                 'wajib' => true,
                 'nominal_valid' => 7000,
+                'is_nominal_varian' => true
             ],
             [// 5
                 'pos_id' => 1,
@@ -136,6 +138,7 @@ class PosPemasukanSeeder extends Seeder
                 'wajib' => true,
                 'optional' => false,
                 'nominal_valid' => 10000,
+                'is_nominal_varian' => true
             ],
             [// 16
                 'pos_id' => 1,
@@ -145,6 +148,7 @@ class PosPemasukanSeeder extends Seeder
                 'wajib' => false,
                 'optional' => true,
                 'nominal_valid' => 0,
+                'is_nominal_varian' => true
             ],
         ];
         foreach ($dataPosPemasukan as $item) {

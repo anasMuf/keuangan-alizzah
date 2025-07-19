@@ -22,6 +22,7 @@ return new class extends Migration
             $table->enum('pembayaran',['sekali','harian','mingguan','bulanan','tahunan'])->nullable();
             $table->boolean('hari_aktif')->default(false);
             $table->decimal('nominal_valid',15,2)->default(0);
+            $table->boolean('is_nominal_varian')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });

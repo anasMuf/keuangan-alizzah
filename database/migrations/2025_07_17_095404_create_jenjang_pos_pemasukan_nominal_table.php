@@ -11,12 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('jenjang_pos_pemasukan_detail', function (Blueprint $table) {
+        Schema::create('jenjang_pos_pemasukan_nominal', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('jenjang_pos_pemasukan_id')->references('id')->on('jenjang_pos_pemasukan')->cascadeOnDelete();
-            $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan'])->nullable();
+            $table->foreignId('jenjang_pos_pemasukan_detail_id')
+                // ->references('id')->on('jenjang_pos_pemasukan_detail')
+                // ->cascadeOnDelete()
+                ;
+            $table->foreignId('bulan_id')->nullable()
+                ->references('id')->on('bulan')
+                ->nullOnDelete();
             $table->decimal('nominal', 15, 2);
-            $table->boolean('is_nominal_bulan')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -27,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('jenjang_pos_pemasukan_detail');
+        Schema::dropIfExists('jenjang_pos_pemasukan_nominal');
     }
 };

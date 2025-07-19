@@ -15,6 +15,11 @@ class JenjangPosPemasukanDetail extends Model
     protected $table = 'jenjang_pos_pemasukan_detail';
     protected $guarded = ['id'];
 
+    public function jenjang_pos_pemasukan_nominal()
+    {
+        return $this->hasMany(JenjangPosPemasukanNominal::class, 'jenjang_pos_pemasukan_detail_id', 'id');
+    }
+
     public function jenjang_pos_pemasukan() : BelongsTo
     {
         return $this->belongsTo(JenjangPosPemasukan::class, 'jenjang_pos_pemasukan_id', 'id');
