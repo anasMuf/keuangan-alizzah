@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class TagihanSiswaService
 {
-    public function create(array $data) : array
+    public function create(array $data, $customPos = null) : array
     {
         //cek isi pos_pemasukan ada atau tidak
         if(PosPemasukan::whereIn('pembayaran',['sekali','harian','mingguan','bulanan','tahunan'])->count() > 0) {
@@ -23,6 +23,15 @@ class TagihanSiswaService
             $totalNominal = 0;
             //ambil semua pos_pemasukan yang aktif
             $posPemasukan = PosPemasukan::with('jenjang_pos_pemasukan.jenjang_pos_pemasukan_detail')->where(['wajib' => true, 'optional' => false])->get();
+            if($customPos) {
+                $posPemasukan = PosPemasukan::with('jenjang_pos_pemasukan.jenjang_pos_pemasukan_detail')->where('id', $customPos)->get();
+            }
+            if($posPemasukan->isEmpty()) {
+                return [
+                    'success' => false,
+                    'message' => 'Tidak ada pos pemasukan yang dimaksud.',
+                ];
+            }
             foreach($posPemasukan as $itemPosPemasukan) {
                 $nominal = $itemPosPemasukan->nominal_valid;
                 $existingTagihan = TagihanSiswa::where('siswa_kelas_id', $siswa_kelas_id)
@@ -33,8 +42,10 @@ class TagihanSiswaService
                 $kelasBiayaAwal = true;
                 // // jika biaya awal, maka buat tagihan
                 if($itemPosPemasukan->id == 1) {
-                    $existingTagihan = null; // set existingTagihan ke null agar tagihan dibuat
                     $kelasBiayaAwal = $data['siswa_kelas']['kelas']['biaya_awal'];
+                    // if($kelasBiayaAwal) {
+                    //     $existingTagihan = null; // set existingTagihan ke null agar tagihan dibuat
+                    // }
                 };
                 if(!$existingTagihan && $kelasBiayaAwal) {
                     foreach($itemPosPemasukan->jenjang_pos_pemasukan as $itemJenjangPosPemasukan) {
@@ -48,7 +59,7 @@ class TagihanSiswaService
                             }
                         }
                         if($persentase_overide > 0) {
-                            $totalNominal = $nominal - ($nominal * $persentase_overide / 100);
+                            $totalNominal = $nominal - ($nominal * $persentase_overide);
                         }elseif($nominal_overide > 0) {
                             $totalNominal = $nominal - $nominal_overide;
                         }else{
@@ -91,6 +102,7 @@ class TagihanSiswaService
                                         'keterangan' => '',
                                     ]);
                                 }
+                                LogPretty::info('Membuat tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan);
                             }else{
                                 // jika pembayaran sekali
                                 $tagihanSiswaService = new TagihanSiswa();
@@ -110,6 +122,8 @@ class TagihanSiswaService
                                     'status' => 'belum_bayar',
                                     'keterangan' => '',
                                 ]);
+                                Log::info('Kelas biaya awal: ' . $kelasBiayaAwal);
+                                LogPretty::info('Membuat tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan);
                             }
                         }
                     }

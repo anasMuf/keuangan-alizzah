@@ -13,4 +13,14 @@ class PosPengeluaran extends Model
     protected $connection = 'mysql';
     protected $table = 'pos_pengeluaran';
     protected $guarded = ['id'];
+
+    public function pos_pemasukan()
+    {
+        return $this->belongsTo(PosPemasukan::class, 'pos_pemasukan_id', 'id');
+    }
+
+    public function pos()
+    {
+        return $this->belongsTo(Pos::class, 'pos_id', 'id');
+    }
 }

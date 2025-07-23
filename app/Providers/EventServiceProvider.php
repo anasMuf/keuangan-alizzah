@@ -101,6 +101,11 @@ class EventServiceProvider extends ServiceProvider
                 'route' => 'pemasukan.main',
                 'active' => ['pemasukan/form', 'pemasukan/form*', 'regex:@^pemasukan/form/[0-9]+$@'],
             ]);
+            $event->menu->add([
+                'text' => 'Tagihan Siswa',
+                'route' => 'tagihan_siswa.main',
+                'active' => ['tagihan-siswa/form', 'tagihan-siswa/form*', 'regex:@^tagihan-siswa/form/[0-9]+$@'],
+            ]);
         });
     }
 

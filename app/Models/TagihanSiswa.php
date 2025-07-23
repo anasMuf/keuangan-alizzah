@@ -51,4 +51,9 @@ class TagihanSiswa extends Model
     {
         return $this->belongsTo(PosPemasukan::class);
     }
+
+    public function siswa_dispensasi()
+    {
+        return $this->belongsTo(SiswaDispensasi::class);
+    }
 }

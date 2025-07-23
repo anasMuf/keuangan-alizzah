@@ -6,6 +6,7 @@ use App\Models\KategoriDispensasi;
 use App\Models\SIAKAD\SiswaKelas;
 use App\Models\PosPemasukan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ReferensiController extends Controller
 {
@@ -30,12 +31,6 @@ class ReferensiController extends Controller
     public function posPemasukanByJenjang(Request $request)
     {
         $jenjangId = $request->jenjang_id;
-        // $pos = PosPemasukan::with('pemasukan_detail')
-        // ->whereHas('jenjang_pos_pemasukan', function($q) use ($jenjangId) {
-        //     $q->where('jenjang_id', $jenjangId);
-        // })
-        // ->get();
-
         $siswa_kelas_id = $request->siswa_kelas_id; // Tambahkan parameter siswa_id
 
         $pos = PosPemasukan::with([
@@ -48,29 +43,8 @@ class ReferensiController extends Controller
             ->whereHas('jenjang_pos_pemasukan', function($q) use ($jenjangId) {
                 $q->where('jenjang_id', $jenjangId);
             })
-            ->where('wajib', false) // Filter hanya pos pemasukan yang wajib
-            ->get()
-            // ->filter(function($posPemasukan) {
-            //     // Jika wajib = true dan tipe pembayaran adalah 'sekali'
-            //     if ($posPemasukan->wajib && $posPemasukan->pembayaran === 'sekali') {
-            //         // Cek apakah sudah ada transaksi untuk pos ini, jika sudah ada maka tidak tampil
-            //         return $posPemasukan->pemasukan_detail->isEmpty();
-            //     }
-
-            //     // Jika wajib = false dan tipe pembayaran adalah 'sekali', tetap tampil
-            //     if (!$posPemasukan->wajib && $posPemasukan->pembayaran === 'sekali') {
-            //         return true;
-            //     }
-
-            //     // Untuk tipe 'bulanan' dan 'tahunan', selalu tampilkan
-            //     if (in_array($posPemasukan->pembayaran, ['bulanan', 'tahunan'])) {
-            //         return true;
-            //     }
-
-            //     return false;
-            // })
-            // ->values()
-            ; // Reset array keys setelah filter
+            ->where('wajib', false) // Filter hanya pos pemasukan lainnya atau tidak wajib
+            ->get();
 
         return response()->json($pos);
     }
@@ -88,5 +62,19 @@ class ReferensiController extends Controller
         $data = KategoriDispensasi::find($id);
 
         return response()->json($data);
+    }
+
+    public function subtotalTabungan(Request $request)
+    {
+        // Hitung subtotal pembayaran untuk pos tabungan
+        $totals = DB::table('pemasukan_detail as pd')
+            ->join('pos_pemasukan as p', 'pd.pos_pemasukan_id', '=', 'p.id')
+            ->join('pemasukan_pembayaran as pp', 'pd.id', '=', 'pp.pemasukan_detail_id')
+            ->where('p.tabungannya', true)
+            ->groupBy('pd.pos_pemasukan_id')
+            ->select('pd.pos_pemasukan_id', DB::raw('SUM(pp.nominal) as subtotal'))
+            ->get();
+
+        return response()->json($totals);
     }
 }

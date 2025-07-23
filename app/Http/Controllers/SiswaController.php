@@ -79,6 +79,7 @@ class SiswaController extends Controller
     }
 
     public function store(Request $request){
+        return $request->all();
         $rules = [
             'nama_lengkap' => 'required',
             'nama_panggilan' => 'required',

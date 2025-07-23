@@ -6,6 +6,7 @@ use App\Models\SIAKAD\Siswa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SiswaDispensasi extends Model
 {
@@ -14,6 +15,10 @@ class SiswaDispensasi extends Model
     protected $connection = 'mysql';
     protected $table = "siswa_dispensasi";
     protected $guarded = ['id'];
+
+    public function tagihan_siswa() :HasMany{
+        return $this->hasMany(TagihanSiswa::class, 'siswa_dispensasi_id', 'id');
+    }
 
     public function siswa(): BelongsTo {
         return $this->belongsTo(Siswa::class);

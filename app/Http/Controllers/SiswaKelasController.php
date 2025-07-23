@@ -62,12 +62,14 @@ class SiswaKelasController extends Controller
     public function storeFromKelas(Request $request){
         $rules = [
             'nama_lengkap' => 'required',
+            'jenis_kelamin' => 'required',
         ];
         $messages = [
             'required' => ':attribute harus diisi',
         ];
         $attributes = [
             'nama_lengkap' => 'Nama Lengkap',
+            'jenis_kelamin' => 'Jenis Kelamin',
         ];
         $validator = Validator::make($request->all(),$rules,$messages,$attributes);
 
@@ -91,6 +93,7 @@ class SiswaKelasController extends Controller
             }
             $siswa = Siswa::create([
                 'nama_lengkap' => $request->nama_lengkap,
+                'jenis_kelamin' => $request->jenis_kelamin,
             ]);
 
             SiswaKelas::create([

@@ -16,7 +16,7 @@ class PosPengeluaranController extends Controller
         $data['heads'] = [
             ['label' => 'No', 'width' => 4],
             'Nama Pos Pengeluaran',
-            'Nominal',
+            // 'Nominal',
             ['label' => 'Actions', 'no-export' => true, 'width' => 5],
         ];
 
@@ -25,7 +25,12 @@ class PosPengeluaranController extends Controller
         $data['config'] = [
             'data' => [],
             'order' => [[0, 'asc']],
-            'columns' => [null, null, null, ['orderable' => false]]
+            'columns' => [
+                null,
+                null,
+                // null,
+                ['orderable' => false]
+            ]
         ];
 
         $btnDelete = '';
@@ -44,7 +49,7 @@ class PosPengeluaranController extends Controller
             $data['config']['data'][] = [
                 $no++,
                 $item->nama_pos_pengeluaran,
-                'Rp '.number_format($item->nominal_valid,0,',','.'),
+                // 'Rp '.number_format($item->nominal_valid,0,',','.'),
                 '<nobr>'.$btnDelete.$btnDetails.'</nobr>'
             ];
         }

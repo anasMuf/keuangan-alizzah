@@ -16,6 +16,7 @@ return new class extends Migration
             $table->enum('kategori',['bebean_operasional','beban_administrasi'])->nullable();
             $table->string('nama_pos_pengeluaran');
             $table->foreignId('pos_id')->references('id')->on('pos')->cascadeOnDelete();
+            $table->foreignId('pos_pemasukan_id')->references('id')->on('pos_pemasukan')->cascadeOnDelete();
             $table->decimal('nominal_valid',15,2);
             $table->timestamps();
             $table->softDeletes();

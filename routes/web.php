@@ -65,15 +65,6 @@ Route::middleware('auth')->group(function(){
         Route::get('/download-template', 'downloadTemplate')->name('.download.template');
     });
 
-    Route::prefix('tagihan')->as('tagihan')->controller(TagihanSiswaController::class)->group(function(){
-        Route::get('/', 'index')->name('.main');
-        Route::get('/form', 'form')->name('.form');
-        Route::post('/store', 'store')->name('.store');
-        Route::delete('/delete/{id}', 'delete')->name('.delete');
-
-        Route::get('/generate', 'generateTagihanSiswa')->name('.generate');
-    });
-
     Route::prefix('/jenjang')->as('jenjang')->controller(JenjangController::class)->group(function(){
         Route::get('/','index')->name('.main');
         Route::get('/form','form')->name('.form');
@@ -188,6 +179,15 @@ Route::middleware('auth')->group(function(){
 
         Route::post('/store','store')->name('.store');
         Route::delete('/delete/{id}','delete')->name('.delete');
+    });
+    Route::prefix('/tagihan-siswa')->as('tagihan_siswa')->controller(TagihanSiswaController::class)->group(function(){
+        Route::get('/','index')->name('.main');
+        Route::get('/form','form')->name('.form');
+        Route::post('/store','store')->name('.store');
+        Route::delete('/delete/{id}','delete')->name('.delete');
+
+        Route::get('/generate', 'generateTagihanSiswa')->name('.generate');
+        Route::put('/update-dispensasi', 'updateDispensasi')->name('.update_dispensasi');
     });
     // TRANSAKSI END
 

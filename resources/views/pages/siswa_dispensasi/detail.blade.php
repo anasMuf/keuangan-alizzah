@@ -37,6 +37,12 @@
     <hr>
     <div class="action mb-3">
         <a href="{{ $fromSiswa ? route('siswa_dispensasi.form',['siswa_id'=>$siswa->id,'from'=>'siswa']) : route('siswa_dispensasi.form',['siswa_id'=>$siswa->id]) }}" class="btn btn-primary">Tambah</a>
+        {{-- update dispensasi di tagihan --}}
+        <form id="form-update-dispensasi">
+            @csrf
+            <input type="hidden" name="siswa_id" value="{{ $siswa->id }}">
+            <button type="submit" class="btn btn-success">Update Tagihan</button>
+        </form>
     </div>
     <x-adminlte-datatable id="table1" :heads="$heads" :config="$config">
         @foreach($config['data'] as $row)
@@ -107,6 +113,46 @@
                 }
             });
         }
+
+        $('#form-update-dispensasi').submit(function(e){
+            e.preventDefault();
+            var form = $(this); // simpan referensi form untuk serialize nanti
+            Swal.fire({
+                title: "Data akan diupdate!",
+                text: "Apakah Anda yakin data dispensasi di tagihan siswa diupdate?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Update!',
+                cancelButtonText: 'Tidak',
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "put",
+                        url: "{{ route('tagihan_siswa.update_dispensasi') }}",
+                        data: form.serialize(),
+                        dataType: "json",
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: "Sukses",
+                                    text: response.message,
+                                    icon: "success"
+                                });
+                            } else {
+                                let message = response.message;
+                                    $.each(response.message_validation, function (i,msg) {
+                                        message += msg[0]+', <br>';
+                                    })
+                                Swal.fire('Peringatan', message, 'warning')
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire('Terjadi Kesalahan', error, 'error')
+                        }
+                    });
+                }
+            });
+        })
 
     </script>
 @endpush

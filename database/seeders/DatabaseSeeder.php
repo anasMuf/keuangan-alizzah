@@ -34,7 +34,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             BulanSeeder::class,
-            PosPemasukanSeeder::class
+            PosPemasukanSeeder::class,
+            PosPengeluaranSeeder::class,
             // Seeders lainnya
         ]);
     }

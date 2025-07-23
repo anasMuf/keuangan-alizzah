@@ -287,6 +287,7 @@ function loadTagihanSiswa(siswaKelasId,siswaKelasJenisKelamin) {
 // Render Tagihan Bulanan
 function renderTagihanBulanan(tagihanBulanan) {
     let html = '';
+    console.log(tagihanBulanan);
 
     // Loop through each month
     $.each(tagihanBulanan, function(bulanId, data) {
@@ -398,7 +399,7 @@ function renderTagihanNonBulanan(tagihanNonBulanan) {
 
 // Helper function untuk menentukan status tagihan
 function getStatusTagihan(tagihan) {
-    console.log(tagihan);
+
 
     if (tagihan.status === 'LUNAS') {
         return 'LUNAS';
@@ -471,12 +472,14 @@ function handleTagihanSelect() {
 
         // Add each pos in the month as separate item
         $.each(details, function(posName, detail) {
-            if(parseFloat(detail.sisa_pembayaran) > 0){
+            if(parseFloat(detail.sisa_pembayaran) > 0 || detail.status != 'lunas'){
                 addItemTransaksi('bulanan', {
                     id: detail.id,
                     bulan_id: bulanId,
                     pos_id: detail.pos_pemasukan_id,
                     pos_name: posName,
+                    istabungan: detail.pos_pemasukan.tabungan,
+                    saldo_tabungan_wajib: detail.pos_pemasukan.saldo_tabungan_wajib,
                     nominal: parseFloat(detail.nominal),
                     sisa: parseFloat(detail.sisa_pembayaran),
                     dibayar: parseFloat(detail.sisa_pembayaran) > 0 ? parseFloat(detail.sisa_pembayaran) : parseFloat(detail.nominal) // Default full payment
@@ -564,7 +567,7 @@ function handleFormSubmit() {
             siswa_kelas_id: selectedSiswaKelas,
             item_transaksi: itemTransaksi
         };
-        console.log(formData);
+
 
 
         $.ajax({
@@ -629,7 +632,7 @@ function hitungTotal() {
     // Calculate totals from all types of items
     $.each(['bulanan', 'non_bulanan', 'lainnya'], function(index, type) {
         $.each(itemTransaksi[type], function(i, item) {
-            console.log(item);
+
 
             if (item.istabungan) {
                 totalTagihan += item.sisa > 0 ? parseFloat(item.sisa+item.dibayar) : parseFloat(item.nominal+item.dibayar) || 0;
@@ -680,7 +683,7 @@ function parseRupiah(rupiahString) {
 
 // Render Item Transaksi
 function renderItemTransaksi() {
-    console.log(itemTransaksi);
+
 
     let html = '';
 
@@ -697,6 +700,9 @@ function renderItemTransaksi() {
                         <p class="mb-1">Total Tagihan: Rp ${formatRupiah(item.nominal)}</p>
                         ${item.sisa > 0 && item.sisa !== item.nominal ? `
                         <p class="mb-0">Sisa: Rp ${formatRupiah(item.sisa)}</p>
+                        ` : ''}
+                        ${item.istabungan ? `
+                        <p class="mb-0">Saldo Tabungan Wajib: Rp ${formatRupiah(item.saldo_tabungan_wajib)}</p>
                         ` : ''}
                     </div>
                     <div class="col-md-6">
@@ -764,7 +770,7 @@ function renderItemTransaksi() {
                         <p class="mb-1">
                         ${!item.istabungan ? `
                         Total Tagihan: Rp ${formatRupiah(item.nominal)}
-                        ` : 'Input Nominal Tabungan'}
+                        ` : 'Saldo Tabungan: Rp ' + formatRupiah(item.saldotabungan)}
                         </p>
                     </div>
                     <div class="col-md-6">
@@ -809,18 +815,18 @@ function getPosName(posId) {
 
 // Load Pos Lainnya
 function loadPosLainnya(selectedSiswaKelasJenjangId) {
-    console.log('selectedSiswaKelas:', selectedSiswaKelas);
+
 
     if (!selectedSiswaKelas) return;
 
-    console.log(selectedSiswaKelasJenjangId);
+
 
 
     $.get('/referensi/pos-pemasukan', {
         jenjang_id: selectedSiswaKelasJenjangId,
         siswa_kelas_id: selectedSiswaKelas
     }, function(res) {
-        console.log(res);
+
 
         let html = '';
 
@@ -837,11 +843,12 @@ function loadPosLainnya(selectedSiswaKelasJenjangId) {
                      data-nominal="${pos.nominal_valid}"
                      data-wajib="0"
                      data-istabungan="${pos.tabungan}"
+                     data-saldotabungan="${pos.saldo_tabungan}"
                      data-pembayaran="${pos.pembayaran}">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="mb-0">${pos.nama_pos_pemasukan}</h6>
-                            <small class="text-muted">${pos.nominal_valid > 0 ? 'Rp '+formatRupiah(pos.nominal_valid) : '' }</small>
+                            <small class="text-muted">${pos.nominal_valid > 0 ? 'Rp '+formatRupiah(pos.nominal_valid) : 'Saldo: Rp '+formatRupiah(pos.saldo_tabungan) }</small>
                         </div>
                         <button class="btn btn-sm btn-primary pilih-pos-lainnya">
                             <i class="fas fa-plus"></i> Pilih
@@ -871,6 +878,7 @@ function initializePosLainnyaHandler() {
         const nominal = parseFloat(posItem.data('nominal'));
         const posName = posItem.find('h6').text();
         const istabungan = posItem.data('istabungan');
+        const saldotabungan = posItem.data('saldotabungan');
 
 
 
@@ -880,6 +888,7 @@ function initializePosLainnyaHandler() {
             pos_id: id,
             pos_name: posName,
             istabungan: istabungan,
+            saldotabungan: saldotabungan,
             nominal: nominal,
             dibayar: nominal
         });

@@ -521,7 +521,7 @@ class PosPemasukanController extends Controller
                 $diskon_persen = $value->diskon_persen ?? 0;
                 $diskon_nominal = $value->diskon_nominal ?? 0;
                 if($diskon_persen > 0){
-                    $totalNominal = $nominalPosPemaukanUntukTagihanSiswa - ($nominalPosPemaukanUntukTagihanSiswa * ($diskon_persen / 100));
+                    $totalNominal = $nominalPosPemaukanUntukTagihanSiswa - ($nominalPosPemaukanUntukTagihanSiswa * $diskon_persen);
                 }elseif($diskon_nominal > 0){
                     $totalNominal = $nominalPosPemaukanUntukTagihanSiswa - $diskon_nominal;
                 }else{

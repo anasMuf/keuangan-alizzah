@@ -13,4 +13,14 @@ class Pos extends Model
     protected $connection = 'mysql';
     protected $table = 'pos';
     protected $guarded = ['id'];
+
+    public function pos_pemasukan()
+    {
+        return $this->hasMany(PosPemasukan::class, 'pos_id', 'id');
+    }
+
+    public function pos_pengeluaran()
+    {
+        return $this->hasMany(PosPengeluaran::class, 'pos_id', 'id');
+    }
 }
