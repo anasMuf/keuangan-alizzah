@@ -90,7 +90,7 @@ class TagihanSiswaController extends Controller
                 }
 
                 if($item->diskon_persen > 0){
-                    $nilaiDispensasi = ($item->diskon*100).'%';
+                    $nilaiDispensasi = ($item->diskon_persen*100).'%';
                 }elseif($item->diskon_nominal > 0){
                     $nilaiDispensasi = 'Rp '.number_format($item->diskon_nominal, 0, ',', '.');
                 }else{
