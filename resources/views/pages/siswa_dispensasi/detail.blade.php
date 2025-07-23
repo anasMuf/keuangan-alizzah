@@ -35,10 +35,10 @@
         </tr>
     </table>
     <hr>
-    <div class="action mb-3">
+    <div class="action mb-3 d-flex">
         <a href="{{ $fromSiswa ? route('siswa_dispensasi.form',['siswa_id'=>$siswa->id,'from'=>'siswa']) : route('siswa_dispensasi.form',['siswa_id'=>$siswa->id]) }}" class="btn btn-primary">Tambah</a>
         {{-- update dispensasi di tagihan --}}
-        <form id="form-update-dispensasi">
+        <form id="form-update-dispensasi" class="ml-2">
             @csrf
             <input type="hidden" name="siswa_id" value="{{ $siswa->id }}">
             <button type="submit" class="btn btn-success">Update Tagihan</button>
