@@ -39,6 +39,7 @@ class PengeluaranController extends Controller
             $query->whereMonth('tanggal', date('m'))
                 ->whereYear('tanggal', date('Y'));
         })
+        ->orderBy('tanggal', 'desc')
         ->get();
 
         $data['config'] = [
@@ -71,6 +72,7 @@ class PengeluaranController extends Controller
             ];
         }
         $data['bulans'] = Bulan::all();
+        $data['bulanSekarang'] = $bulanSekarang;
 
         return view('pages.pengeluaran.index', $data);
     }

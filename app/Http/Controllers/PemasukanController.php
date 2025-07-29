@@ -33,6 +33,8 @@ class PemasukanController extends Controller
             ['label' => 'Actions', 'no-export' => true, 'width' => 5],
         ];
 
+        $bulanSekarang = Bulan::where('angka_bulan', date('n'))->first();
+
         $pemasukan = Pemasukan::with([
             'siswa_kelas.siswa',
             'siswa_kelas.kelas',
@@ -44,6 +46,7 @@ class PemasukanController extends Controller
             $query->whereMonth('tanggal', date('m'))
                 ->whereYear('tanggal', date('Y'));
         })
+        ->orderBy('tanggal', 'desc')
         ->get();
 
         $data['config'] = [
@@ -78,6 +81,7 @@ class PemasukanController extends Controller
             ];
         }
         $data['bulans'] = Bulan::all();
+        $data['bulanSekarang'] = $bulanSekarang;
 
         return view('pages.pemasukan.index', $data);
     }

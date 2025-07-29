@@ -23,7 +23,7 @@
                     <select name="angka_bulan" id="angka_bulan" class="form-control">
                         <option value="">Semua Bulan</option>
                         @foreach($bulans as $b)
-                            <option value="{{ $b->angka_bulan }}" {{ request('angka_bulan') == $b->angka_bulan ? 'selected' : '' }}>{{ $b->nama_bulan }}</option>
+                            <option value="{{ $b->angka_bulan }}" {{ request('angka_bulan') == $b->angka_bulan || $bulanSekarang->angka_bulan == $b->angka_bulan ? 'selected' : '' }}>{{ $b->nama_bulan }}</option>
                         @endforeach
                     </select>
                 </div>
