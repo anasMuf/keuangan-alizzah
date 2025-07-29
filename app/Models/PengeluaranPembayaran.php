@@ -9,4 +9,6 @@ class PengeluaranPembayaran extends Model
 {
     use HasFactory;
     protected $connection = 'mysql';
+    protected $table = 'pengeluaran_pembayaran';
+    protected $guarded = ['id'];
 }

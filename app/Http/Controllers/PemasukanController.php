@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Validator;
 
 class PemasukanController extends Controller
 {
-    public function index() {
+    public function index(Request $request) {
         $data['heads'] = [
             ['label' => 'No', 'width' => 4],
             'Tahun Ajaran',
@@ -37,7 +37,14 @@ class PemasukanController extends Controller
             'siswa_kelas.siswa',
             'siswa_kelas.kelas',
             'tahun_ajaran',
-        ])->get();
+        ])
+        ->when($request->angka_bulan, function($query) use ($request) {
+            $query->whereMonth('tanggal', $request->angka_bulan);
+        }, function($query) {
+            $query->whereMonth('tanggal', date('m'))
+                ->whereYear('tanggal', date('Y'));
+        })
+        ->get();
 
         $data['config'] = [
             'data' => [],
@@ -70,6 +77,7 @@ class PemasukanController extends Controller
                 '<nobr>'.$btnDelete.$btnDetails.'</nobr>'
             ];
         }
+        $data['bulans'] = Bulan::all();
 
         return view('pages.pemasukan.index', $data);
     }
@@ -106,17 +114,33 @@ class PemasukanController extends Controller
     }
 
     public function store(Request $request){
-        // return $request->all();
-        // Validate request
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'siswa_kelas_id' => 'required|exists:mysql_siakad.siswa_kelas,id',
-            'item_transaksi' => 'required|array'
-        ]);
+            'item_transaksi' => 'required|array',
+            'item_transaksi.bulanan' => 'array',
+            'item_transaksi.non_bulanan' => 'array',
+            'item_transaksi.lainnya' => 'array',
+        ];
+        $messages = [
+            'siswa_kelas_id.required' => 'Siswa Kelas harus dipilih',
+            'siswa_kelas_id.exists' => 'Siswa Kelas tidak ditemukan',
+            'item_transaksi.required' => 'Transaksi harus diisi',
+            'item_transaksi.array' => 'Transaksi harus berupa array',
+        ];
+        $attributes = [
+            'siswa_kelas_id' => 'Siswa Kelas',
+            'item_transaksi.bulanan' => 'Transaksi Bulanan',
+            'item_transaksi.non_bulanan' => 'Transaksi Non Bulanan',
+            'item_transaksi.lainnya' => 'Transaksi Lainnya',
+        ];
 
-        if ($validator->fails()) {
+        $validator = Validator::make($request->all(),$rules,$messages,$attributes);
+
+        if($validator->fails()){
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors()
+                'message' => 'Gagal menyimpan data, ',
+                'message_validation' => $validator->getMessageBag()
             ]);
         }
 

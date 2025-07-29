@@ -41,7 +41,7 @@ class TagihanSiswaService
                 // // apakah kelas siswa ini biaya_awal true
                 $kelasBiayaAwal = true;
                 // // jika biaya awal, maka buat tagihan
-                if($itemPosPemasukan->id == 1) {
+                if($itemPosPemasukan->id == 1 && $posPemasukan->isEmpty()) {
                     $kelasBiayaAwal = $data['siswa_kelas']['kelas']['biaya_awal'];
                     // if($kelasBiayaAwal) {
                     //     $existingTagihan = null; // set existingTagihan ke null agar tagihan dibuat

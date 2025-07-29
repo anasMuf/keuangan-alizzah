@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('pengeluaran_pembayaran', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pengeluaran_id')->references('id')->on('pengeluaran')->cascadeOnDelete();
+            $table->foreignId('pengeluaran_detail_id')->references('id')->on('pengeluaran_detail')->cascadeOnDelete();
             $table->dateTime('tanggal');
             $table->decimal('nominal',15,2);
             $table->enum('metode',['tunai','transfer','lainnya'])->nullable();

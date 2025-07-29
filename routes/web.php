@@ -11,6 +11,7 @@ use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\PemasukanController;
 use App\Http\Controllers\ReferensiController;
 use App\Http\Controllers\SiswaKelasController;
+use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\SiswaMutasiController;
 use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\PosPemasukanController;
@@ -188,6 +189,12 @@ Route::middleware('auth')->group(function(){
 
         Route::get('/generate', 'generateTagihanSiswa')->name('.generate');
         Route::put('/update-dispensasi', 'updateDispensasi')->name('.update_dispensasi');
+    });
+    Route::prefix('/pengeluaran')->as('pengeluaran')->controller(PengeluaranController::class)->group(function(){
+        Route::get('/','index')->name('.main');
+        Route::get('/form','form')->name('.form');
+        Route::post('/store','store')->name('.store');
+        Route::delete('/delete/{id}','delete')->name('.delete');
     });
     // TRANSAKSI END
 

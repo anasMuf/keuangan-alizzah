@@ -126,6 +126,7 @@ class TagihanSiswaController extends Controller
             ->whereHas('tahun_ajaran', function($query) {
                 $query->where('is_aktif', true);
             })
+            ->whereHas('siswa')
             ->get();
 
         return view('pages.tagihan_siswa.index', $data);
@@ -331,7 +332,7 @@ class TagihanSiswaController extends Controller
             $siswaDispensasiPosPemasukan = $siswaDispensasi->pluck('pos_pemasukan_id');
 
 
-            $tagihanSiswa = TagihanSiswa::where('tahun_ajaran_id', $tahunAjaran->id)
+            $tagihanSiswa = TagihanSiswa::with('pemasukan_detail')->where('tahun_ajaran_id', $tahunAjaran->id)
                 ->where('siswa_kelas_id', $siswaKelas->id)
                 ->whereIn('pos_pemasukan_id', $siswaDispensasiPosPemasukan)
                 ->get();
@@ -377,11 +378,21 @@ class TagihanSiswaController extends Controller
                     Log::info($totalNominal);
                 }
 
+                $dibayar = 0;
+                $status = $value->status;
+                foreach($value->pemasukan_detail as $detail){
+                    $dibayar += $detail->subtotal;
+                }
+                if($totalNominal >= $dibayar){
+                    $status = 'lunas';
+                }
+
                 $value->update([
                     'siswa_dispensasi_id' => $siswa_dispensasi_id,
                     'diskon_persen' => $diskonPersen,
                     'diskon_nominal' => $diskonNominal,
-                    'nominal' => $totalNominal
+                    'nominal' => $totalNominal,
+                    'status' => $status
                 ]);
             }
 

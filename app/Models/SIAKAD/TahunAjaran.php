@@ -3,6 +3,7 @@
 namespace App\Models\SIAKAD;
 
 use App\Models\JenjangPosPemasukan;
+use App\Models\Pengeluaran;
 use App\Models\TagihanSiswa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,6 +21,10 @@ class TahunAjaran extends Model
 
     public function tagihan_siswa(){
         return $this->hasMany(TagihanSiswa::class);
+    }
+
+    public function pengeluaran(){
+        return $this->hasMany(Pengeluaran::class,'tahun_ajaran_id','id');
     }
 
     public function pemasukan(){

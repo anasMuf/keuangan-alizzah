@@ -2,28 +2,28 @@
 
 {{-- Customize layout sections --}}
 
-@section('subtitle', 'Pemasukan')
+@section('subtitle', 'Pengeluaran')
 @section('content_header_title', 'Home')
-@section('content_header_subtitle', 'Pemasukan')
+@section('content_header_subtitle', 'Pengeluaran')
 @section('plugins.Datatables', true)
 
 {{-- Content body: main page content --}}
 
 @section('content_body')
 
-<x-adminlte-card title="Data Pemasukan">
+<x-adminlte-card title="Data Pengeluaran">
     <div class="action mb-3">
-        <a href="{{ route('pemasukan.form') }}" class="btn btn-primary">Tambah</a>
+        <a href="{{ route('pengeluaran.form') }}" class="btn btn-primary">Tambah</a>
     </div>
     <div class="row filter mb-3">
         <div class="col-md-4">
-            <form action="{{ route('pemasukan.main') }}" method="get" class="form-inline" id="filter">
+            <form action="{{ route('pengeluaran.main') }}" method="get" class="form-inline" id="filter">
                 <div class="form-group">
                     <label for="angka_bulan" class="mr-2">Bulan:</label>
                     <select name="angka_bulan" id="angka_bulan" class="form-control">
                         <option value="">Semua Bulan</option>
                         @foreach($bulans as $b)
-                            <option value="{{ $b->angka_bulan }}" {{ request('angka_bulan') == $b->angka_bulan ? 'selected' : '' }}>{{ $b->nama_bulan }}</option>
+                            <option value="{{ $b->id }}" {{ request('angka_bulan') == $b->id ? 'selected' : '' }}>{{ $b->nama_bulan }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -53,7 +53,7 @@
 
 @push('js')
     <script>
-        $('#angka_bulan').change(() => $('#filter').submit())
+        $('#bulan_id').change(() => $('#filter').submit())
         function deleteData(id,nama){
             Swal.fire({
                 title: "Data akan dihapus!",
@@ -68,7 +68,7 @@
 
                     $.ajax({
                         type: "delete",
-                        url: "/pemasukan/delete/"+id,
+                        url: "/pengeluaran/delete/"+id,
                         data: {
                             "_token": "{{ csrf_token() }}"
                         },
@@ -84,7 +84,7 @@
                                     timer: timer
                                 });
                                 setTimeout(() => {
-                                    location.href = "{{ route('pemasukan.main') }}"
+                                    location.href = "{{ route('pengeluaran.main') }}"
                                 }, timer);
                             }else{
                                 Swal.fire('Peringatan', response.message, 'warning')

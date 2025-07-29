@@ -9,4 +9,6 @@ class PengeluaranDetail extends Model
 {
     use HasFactory;
     protected $connection = 'mysql';
+    protected $table = 'pengeluaran_detail';
+    protected $guarded = ['id'];
 }

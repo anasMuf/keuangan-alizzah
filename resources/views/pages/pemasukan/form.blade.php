@@ -2,9 +2,9 @@
 
 {{-- Customize layout sections --}}
 
-@section('subtitle', 'Pos Pemasukan')
+@section('subtitle', 'Pemasukan')
 @section('content_header_title', 'Home')
-@section('content_header_subtitle', 'Pos Pemasukan')
+@section('content_header_subtitle', 'Pemasukan')
 @section('plugins.Select2', true)
 
 {{-- Content body: main page content --}}
@@ -34,8 +34,19 @@
             </div>
         </div>
 
-        <!-- Panel Tagihan -->
+        <!-- Detail Siswa -->
         <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                    <h5 id="siswa-nama">Nama Siswa: <span class="text-muted">Belum Dipilih</span></h5>
+                    <p id="siswa-kelas">Kelas: <span class="text-muted">Belum Dipilih</span></p>
+                    <p id="siswa-jenjang">Jenjang: <span class="text-muted">Belum Dipilih</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Tagihan -->
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Tagihan</h3>
@@ -140,6 +151,12 @@
         .siswa-results, .pos-results {
             max-height: 300px;
             overflow-y: auto;
+        }
+        .list-on {
+            position: absolute;
+            z-index: 100;
+            width: 100%;
+            left: 0;
         }
         .item-transaksi .card {
             border: 1px solid #ddd;
@@ -256,10 +273,12 @@ function handleSiswaSearch() {
 // Render Functions
 function renderSiswaResults(res) {
     let html = '';
+    $('.siswa-results').addClass('list-on');
     $.each(res, function(index, siswaKelas) {
         html += `
         <a href="#" class="list-group-item list-group-item-action siswa-item"
-           data-id="${siswaKelas.id}">
+           data-id="${siswaKelas.id}"
+           data-siswa='${JSON.stringify(siswaKelas)}'>
             <div class="d-flex w-100">
                 <h5 class="mb-1">${siswaKelas.siswa.nama_lengkap} <span class="jenis-kelamin">${siswaKelas.siswa.jenis_kelamin}</span></h5>
             </div>
@@ -451,11 +470,23 @@ function handleSiswaSelect(e) {
     // Update siswa_kelas_id
     $('#siswa-kelas-id').val(selectedSiswaKelas);
 
+
+    $('.siswa-results .list-group').html('<p class="text-center">Siswa Dipilih</p>');
+
+    $('.siswa-results').removeClass('list-on');
+    loadDetailSiswa(siswa);
+
     // Load tagihan siswa
     loadTagihanSiswa(selectedSiswaKelas,selectedSiswaKelasJenisKelamin);
 
     // load pos lainnya
     loadPosLainnya(selectedSiswaKelasJenjangId);
+}
+
+function loadDetailSiswa(siswa) {
+    $('#siswa-nama').html(`Nama Siswa: <span class="text-muted">${siswa.siswa.nama_lengkap}</span>`);
+    $('#siswa-kelas').html(`Kelas: <span class="text-muted">${siswa.kelas.nama_kelas}</span>`);
+    $('#siswa-jenjang').html(`Jenjang: <span class="text-muted">${siswa.kelas.jenjang.nama_jenjang}</span>`);
 }
 
 // Handle Tagihan Select
@@ -614,7 +645,11 @@ function handleSubmitSuccess(response) {
             window.location.href = "{{ route('pemasukan.main') }}";
         });
     } else {
-        Swal.fire('Gagal', response.message, 'error');
+        let message = response.message;
+        $.each(response.message_validation, function (i,msg) {
+            message += msg[0]+', <br>';
+        });
+        Swal.fire('Peringatan', message, 'warning');
     }
 }
 
@@ -632,16 +667,21 @@ function hitungTotal() {
     // Calculate totals from all types of items
     $.each(['bulanan', 'non_bulanan', 'lainnya'], function(index, type) {
         $.each(itemTransaksi[type], function(i, item) {
+            console.log(item);
 
 
-            if (item.istabungan) {
+            if (item.istabungan && !item.bulan_id) {
                 totalTagihan += item.sisa > 0 ? parseFloat(item.sisa+item.dibayar) : parseFloat(item.nominal+item.dibayar) || 0;
             }else{
                 totalTagihan += item.sisa > 0 ? parseFloat(item.sisa) : parseFloat(item.nominal) || 0;
             }
+
             totalBayar += parseFloat(item.dibayar) || 0;
         });
     });
+    console.log('totalTagihan:', totalTagihan);
+    console.log('totalBayar:', totalBayar);
+
 
     // Display formatted totals
     $('#total-tagihan').text(`Rp ${formatRupiah(totalTagihan)}`);
@@ -701,9 +741,9 @@ function renderItemTransaksi() {
                         ${item.sisa > 0 && item.sisa !== item.nominal ? `
                         <p class="mb-0">Sisa: Rp ${formatRupiah(item.sisa)}</p>
                         ` : ''}
-                        ${item.istabungan ? `
+                        ${item.istabungan ? /*`
                         <p class="mb-0">Saldo Tabungan Wajib: Rp ${formatRupiah(item.saldo_tabungan_wajib)}</p>
-                        ` : ''}
+                        `*/'' : ''}
                     </div>
                     <div class="col-md-6">
                         <div class="form-group mb-0">

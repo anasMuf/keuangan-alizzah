@@ -23,7 +23,11 @@ class Bulan extends Model
         return $this->hasMany(JenjangPosPemasukanNominal::class);
     }
 
-    // public function pemasukan(){
-    //     return $this->hasMany(TahunAjaran::class,'bulan_id','id');
-    // }
+    public function pengeluaran(){
+        return $this->hasMany(Pengeluaran::class,'bulan_id','id');
+    }
+
+    public function pemasukan(){
+        return $this->hasMany(Pemasukan::class,'bulan_id','id');
+    }
 }

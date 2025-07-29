@@ -46,7 +46,7 @@ class PosPemasukan extends Model
 
     public function pos_pengeluaran()
     {
-        return $this->hasOne(PosPengeluaran::class, 'pos_pemasukan_id', 'id');
+        return $this->hasMany(PosPengeluaran::class, 'pos_pemasukan_id', 'id');
     }
 
     public function tagihan_siswa(){
