@@ -15,6 +15,11 @@
         @csrf
         <input type="hidden" name="id_pos_pengeluaran" id="id_pos_pengeluaran" value="{{ $data ? old('id_pos_pengeluaran',$data->id) : old('id_pos_pengeluaran') }}">
         <div class="row">
+            <x-adminlte-select2 name="pos_pemasukan_id" label="Pos Pemasukan" fgroup-class="col-md-6">
+                <x-adminlte-options :options="$pos_pemasukan"
+                selected="{{ $data ? old('pos_pemasukan_id',$data->pos_pemasukan_id) : old('pos_pemasukan_id') }}" empty-option=".:: Pilih Pos Pemasukan ::."/>
+            </x-adminlte-select2>
+
             <x-adminlte-input name="nama_pos_pengeluaran" label="Nama Pos Pengeluaran" placeholder="Tulis Nama Pos Pengeluaran" id="nama_pos_pengeluaran"
                 fgroup-class="col-md-6" disable-feedback enable-old-support error-key value="{{ $data ? old('nama_pos_pengeluaran',$data->nama_pos_pengeluaran) : old('nama_pos_pengeluaran') }}"/>
 
@@ -23,8 +28,8 @@
                 selected="{{ $data ? old('kategori',$data->kategori) : old('kategori') }}" empty-option=".:: Pilih Kategori Pos Pengeluaran ::."/>
             </x-adminlte-select>
 
-            <x-adminlte-input type="number" min="0" step="500" name="nominal_valid" label="Nominal" placeholder="Tulis Nominal" id="nominal_valid"
-                fgroup-class="col-md-6" disable-feedback enable-old-support error-key value="{{ $data ? old('nominal_valid',number_format($data->nominal_valid,0,',','')) : old('nominal_valid') }}"/>
+            <x-adminlte-input hidden type="number" min="0" step="500" name="nominal_valid" {{-- label="Nominal" --}} placeholder="Tulis Nominal" id="nominal_valid"
+                fgroup-class="col-md-6" disable-feedback enable-old-support error-key value="{{ $data ? old('nominal_valid',number_format($data->nominal_valid,0,',','')) : old('nominal_valid',0) }}"/>
         </div>
     </form>
 

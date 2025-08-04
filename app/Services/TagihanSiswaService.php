@@ -47,6 +47,10 @@ class TagihanSiswaService
                     //     $existingTagihan = null; // set existingTagihan ke null agar tagihan dibuat
                     // }
                 };
+                LogPretty::info('Cek tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan, [
+                    'kelas_biaya_awal' => $kelasBiayaAwal,
+                    'existing_tagihan' => $existingTagihan,
+                ]);
                 if(!$existingTagihan && $kelasBiayaAwal) {
                     foreach($itemPosPemasukan->jenjang_pos_pemasukan as $itemJenjangPosPemasukan) {
                         if($itemJenjangPosPemasukan->jenjang_pos_pemasukan_detail){

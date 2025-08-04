@@ -6,7 +6,10 @@ use App\Helpers\LogPretty;
 use App\Imports\SiswaImport;
 use App\Models\SIAKAD\Kelas;
 use App\Models\SIAKAD\Siswa;
+use App\Models\TagihanSiswa;
 use Illuminate\Http\Request;
+use App\Models\SiswaDispensasi;
+use App\Models\SIAKAD\SiswaKelas;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
@@ -126,6 +129,10 @@ class SiswaController extends Controller
         DB::beginTransaction();
         try {
             $siswa = Siswa::findOrFail($id);
+            $siswaKelas = SiswaKelas::where('siswa_id', $siswa->id)->firstOfAll();
+            SiswaDispensasi::where('siswa_id', $siswa->id)->delete();
+            TagihanSiswa::where('siswa_kelas_id', $siswaKelas->id)->delete();
+            $siswaKelas->delete();
             $siswa->delete();
 
             DB::commit();

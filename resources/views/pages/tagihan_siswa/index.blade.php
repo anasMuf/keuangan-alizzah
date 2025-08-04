@@ -2,9 +2,9 @@
 
 {{-- Customize layout sections --}}
 
-@section('subtitle', 'Siswa')
+@section('subtitle', 'Tagihan Siswa')
 @section('content_header_title', 'Home')
-@section('content_header_subtitle', 'Siswa')
+@section('content_header_subtitle', 'Tagihan Siswa')
 @section('plugins.Datatables', true)
 @section('plugins.Select2', true)
 
@@ -44,13 +44,28 @@
             <a href="{{ route('tagihan_siswa.generate') }}" onclick="return confirm('Apakah Anda yakin ingin memperbarui tagihan siswa?')" class="btn btn-warning ml-2">Perbarui Tagihan Siswa</a>
         </div>
         <div class="col-md-6 filter">
-            <form action="{{ route('tagihan_siswa.main') }}" method="get" class="" id="filter">
-                <div class="form-group w-100">
+            <form action="{{ route('tagihan_siswa.main') }}" method="get" class="d-flex justify-content-around" id="filter">
+                <div class="form-group">
                     <label for="siswa_id" class="mr-2">Siswa:</label>
                     <select name="siswa_id" id="siswa_id" class="form-control select2">
                         <option value="">.:: Pilih Siswa :..</option>
                         @foreach($siswa_kelas as $sk)
                             <option value="{{ $sk->siswa->id }}" {{ request('siswa_id') == $sk->siswa->id ? 'selected' : '' }}>{{ $sk->siswa->nama_lengkap }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bulan_id" class="mr-2">Bulan:</label>
+                    <select name="bulan_id" id="bulan_id" class="form-control select2">
+                        <option value="all" {{ request('bulan_id') == 'all' ? 'selected' : '' }}>Semua Bulan</option>
+                        @foreach($bulans as $b)
+                            <option value="{{ $b->id }}"
+                                @if(request('bulan_id'))
+                                    {{ request('bulan_id') == $b->id ? 'selected' : '' }}
+                                @else
+                                    {{ (isset($bulanSekarang) && $bulanSekarang->id == $b->id) ? 'selected' : '' }}
+                                @endif
+                            >{{ $b->nama_bulan }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -95,6 +110,7 @@
             allowClear: true
         });
         $('#siswa_id').change(() => $('#filter').submit())
+        $('#bulan_id').change(() => $('#filter').submit())
 
         function deleteData(id,nama){
             Swal.fire({

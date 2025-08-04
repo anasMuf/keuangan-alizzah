@@ -31,30 +31,65 @@
                 </div>
                 <div class="row">
                     <h5 class="col-12">Informasi Pos Pemasukan</h5>
-                    <x-adminlte-select name="jenis" label="Jenis Pos Pemasukan" fgroup-class="col-md-6">
-                        <x-adminlte-options :options="$jenis"
-                        :selected="$data ? old('jenis',$jenisSelected) : old('jenis')" empty-option=".:: Pilih Jenis Pos Pemasukan ::."/>
-                    </x-adminlte-select>
+                    <div class="col-12">
+                        <div class="row mb-3">
+                            <x-adminlte-select name="jenis" label="Jenis Pos Pemasukan" fgroup-class="col-md-12">
+                                <x-adminlte-options :options="$jenis"
+                                :selected="$data ? old('jenis',$jenisSelected) : old('jenis')" empty-option=".:: Pilih Jenis Pos Pemasukan ::."/>
+                            </x-adminlte-select>
 
-                    <x-adminlte-select name="pembayaran" label="Pembayaran" fgroup-class="col-md-6">
-                        <x-adminlte-options :options="$pembayaran"
-                        :selected="$data ? old('pembayaran',$pembayaranSelected) : old('pembayaran')" empty-option=".:: Pilih Pembayaran ::."/>
-                    </x-adminlte-select>
+                            <div class="form-group col-md-12 d-flex align-items-center mb-2 pt-0">
+                                <label for="optional">
+                                    <input type="checkbox" name="optional" id="optional" {{ $data && $data->optional ? 'checked' : '' }} />
+                                    extra/pasta/daycare?
+                                </label>
+                            </div>
+                            <hr>
 
-                    <x-adminlte-input name="nama_pos_pemasukan" label="Nama Pos Pemasukan" placeholder="Tulis Nama Pos Pemasukan" id="nama_pos_pemasukan"
-                        fgroup-class="col-md-5" disable-feedback enable-old-support error-key value="{{ $data ? old('nama_pos_pemasukan',$data->nama_pos_pemasukan) : old('nama_pos_pemasukan') }}"/>
+                            <x-adminlte-select name="pembayaran" label="Pembayaran" fgroup-class="col-md-12" id="pembayaran">
+                                <x-adminlte-options :options="$pembayaran"
+                                :selected="$data ? old('pembayaran',$pembayaranSelected) : old('pembayaran')" empty-option=".:: Pilih Pembayaran ::."/>
+                            </x-adminlte-select>
 
-                    <div class="form-group col-md-2 d-flex align-items-center mb-0 pt-4">
-                        <label for="nominal_perjenjang">
-                            <input type="checkbox" name="nominal_perjenjang" id="nominal_perjenjang" {{ $data && $data->is_nominal_varian ? 'checked' : '' }} />
-                            nominal perjenjang?
-                        </label>
+                            <div class="form-group col-md-12 d-flex align-items-center mb-0 pt-0">
+                                <label for="hari_aktif">
+                                    <input type="checkbox" name="hari_aktif" id="hari_aktif" {{ $data && $data->hari_aktif ? 'checked' : '' }} disabled />
+                                    nominal sesuai jumlah hari dalam sebulan?
+                                </label>
+                            </div>
+                            <hr>
+                        </div>
                     </div>
 
-                    @if ($data && !$data->hari_aktif)
-                    <x-adminlte-input type="number" min="0" step="500" name="nominal_valid" label="Nominal" placeholder="Tulis Nominal" id="nominal_valid"
-                        fgroup-class="col-md-5" disable-feedback enable-old-support error-key value="{{ $data ? old('nominal_valid',number_format($data->nominal_valid,0,',','')) : old('nominal_valid') }}"/>
-                    @endif
+                    <x-adminlte-input name="nama_pos_pemasukan" label="Nama Pos Pemasukan" placeholder="Tulis Nama Pos Pemasukan" id="nama_pos_pemasukan"
+                        fgroup-class="col-md-12" disable-feedback enable-old-support error-key value="{{ $data ? old('nama_pos_pemasukan',$data->nama_pos_pemasukan) : old('nama_pos_pemasukan') }}"/>
+
+                    <div class="form-group col-md-12 d-flex align-items-center mb-0 pt-0">
+                        <label for="tabungan">
+                            <input type="checkbox" name="tabungan" id="tabungan" {{ $data && $data->tabungan ? 'checked' : '' }} />
+                            tabungan?
+                        </label>
+                    </div>
+                    <hr>
+
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="form-group col-md-12 d-flex align-items-center mb-0 pt-4">
+                                <label for="nominal_perjenjang">
+                                    <input type="checkbox" name="nominal_perjenjang" id="nominal_perjenjang" {{ $data && $data->is_nominal_varian ? 'checked' : '' }} />
+                                    nominal perjenjang?
+                                </label>
+                            </div>
+
+                            @if ($data && !$data->hari_aktif)
+                            <x-adminlte-input type="number" min="0" step="500" name="nominal_valid" label="Nominal" placeholder="Tulis Nominal" id="nominal_valid"
+                                fgroup-class="col-md-12" disable-feedback enable-old-support error-key value="{{ $data ? old('nominal_valid',number_format($data->nominal_valid,0,',','')) : old('nominal_valid') }}"/>
+                            @else
+                                <x-adminlte-input type="number" min="0" step="500" name="nominal_valid" label="Nominal" placeholder="Tulis Nominal" id="nominal_valid"
+                                    fgroup-class="col-md-12" disable-feedback enable-old-support error-key value="{{ $data ? old('nominal_valid',number_format($data->nominal_valid,0,',','')) : old('nominal_valid') }}"/>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </form>
 
@@ -63,7 +98,9 @@
             <x-adminlte-button form="formData" class="btn-flat" type="submit" label="Submit" theme="success" icon="fas fa-lg fa-save" id="submitButton"/>
         </x-adminlte-card>
 
+        @if ($data)
         <button class="btn btn-primary" onclick="syncPosPemasukanTagihanSiswa({{ $data->id }}, '{{ $data->nama_pos_pemasukan }}')">Update Nominal di Tagihan</button>
+        @endif
     </div>
     @if($data && $data->is_nominal_varian)
     <div class="col-6">
@@ -125,9 +162,22 @@
             $("#nominal_perjenjang").change(function () {
                 toggleMasaAktif();
             });
+            $("#pembayaran").change(function () {
+                togglePembayaranBulanan($(this).val());
+            });
 
             toggleMasaAktif();
+            togglePembayaranBulanan();
         });
+
+        function togglePembayaranBulanan(val) {
+            if (val == 'bulanan') {
+                $('#hari_aktif').prop('disabled', false);
+            }else{
+                $('#hari_aktif').prop('checked', false);
+                $('#hari_aktif').prop('disabled', true);
+            }
+        }
 
         function toggleMasaAktif() {
             if ($('#nominal_perjenjang').is(':checked')) {

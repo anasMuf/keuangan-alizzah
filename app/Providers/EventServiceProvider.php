@@ -89,6 +89,16 @@ class EventServiceProvider extends ServiceProvider
                         'text' => 'Kelulusan Siswa',
                         'route' => 'siswa_kelulusan.main',
                         'active' => ['siswa-kelulusan/form', 'siswa-kelulusan/form*', 'regex:@^siswa-kelulusan/form/[0-9]+$@'],
+                    ],
+                    [
+                        'text' => 'Ekstrakulikuler Siswa',
+                        'route' => 'siswa_ekstrakulikuler.main',
+                        'active' => ['siswa-ekstrakulikuler/form', 'siswa-ekstrakulikuler/form*', 'regex:@^siswa-ekstrakulikuler/form/[0-9]+$@'],
+                    ],
+                    [
+                        'text' => 'Daycare Siswa',
+                        'route' => 'siswa_daycare.main',
+                        'active' => ['siswa-daycare/form', 'siswa-daycare/form*', 'regex:@^siswa-daycare/form/[0-9]+$@'],
                     ]
                 ]
             ]);
@@ -124,8 +134,18 @@ class EventServiceProvider extends ServiceProvider
                         'text' => 'Pengeluaran',
                         'route' => 'pengeluaran.main',
                         'active' => ['pengeluaran/form', 'pengeluaran/form*', 'regex:@^pengeluaran/form/[0-9]+$@'],
+                    ],
+                    [
+                        'text' => 'Tabungan Siswa',
+                        'route' => 'tabungan_siswa.main',
+                        'active' => ['tabungan-siswa/form', 'tabungan-siswa/form*', 'regex:@^tabungan-siswa/form/[0-9]+$@'],
                     ]
                 ],
+            ]);
+            $event->menu->add([
+                'text' => 'LAPORAN',
+                'route' => 'laporan.main',
+                'active' => ['laporan', 'laporan/*', 'regex:@^laporan/[a-zA-Z0-9_-]+$@'],
             ]);
         });
     }

@@ -278,7 +278,7 @@ function renderSiswaResults(res) {
         html += `
         <a href="#" class="list-group-item list-group-item-action siswa-item"
            data-id="${siswaKelas.id}"
-           data-siswa='${JSON.stringify(siswaKelas)}'>
+           data-siswakelas="${btoa(unescape(encodeURIComponent(JSON.stringify(siswaKelas))))}">
             <div class="d-flex w-100">
                 <h5 class="mb-1">${siswaKelas.siswa.nama_lengkap} <span class="jenis-kelamin">${siswaKelas.siswa.jenis_kelamin}</span></h5>
             </div>
@@ -462,7 +462,7 @@ function handleSiswaSelect(e) {
     resetSelection();
 
     selectedSiswaKelas = $(this).data('id');
-    const siswa = $(this).data('siswa');
+    const siswaKelas = JSON.parse(decodeURIComponent(escape(atob($(this).attr('data-siswakelas')))));
     selectedSiswaKelasJenjangId = $(this).find('small').data('id');
     selectedSiswaKelasJenisKelamin = $(this).find('h5 > span').text();
 
@@ -474,7 +474,7 @@ function handleSiswaSelect(e) {
     $('.siswa-results .list-group').html('<p class="text-center">Siswa Dipilih</p>');
 
     $('.siswa-results').removeClass('list-on');
-    loadDetailSiswa(siswa);
+    loadDetailSiswa(siswaKelas);
 
     // Load tagihan siswa
     loadTagihanSiswa(selectedSiswaKelas,selectedSiswaKelasJenisKelamin);
@@ -483,10 +483,12 @@ function handleSiswaSelect(e) {
     loadPosLainnya(selectedSiswaKelasJenjangId);
 }
 
-function loadDetailSiswa(siswa) {
-    $('#siswa-nama').html(`Nama Siswa: <span class="text-muted">${siswa.siswa.nama_lengkap}</span>`);
-    $('#siswa-kelas').html(`Kelas: <span class="text-muted">${siswa.kelas.nama_kelas}</span>`);
-    $('#siswa-jenjang').html(`Jenjang: <span class="text-muted">${siswa.kelas.jenjang.nama_jenjang}</span>`);
+function loadDetailSiswa(siswaKelas) {
+    console.log(siswaKelas);
+
+    $('#siswa-nama').html(`Nama Siswa: <span class="text-muted">${siswaKelas.siswa.nama_lengkap}</span>`);
+    $('#siswa-kelas').html(`Kelas: <span class="text-muted">${siswaKelas.kelas.nama_kelas}</span>`);
+    $('#siswa-jenjang').html(`Jenjang: <span class="text-muted">${siswaKelas.kelas.jenjang.nama_jenjang}</span>`);
 }
 
 // Handle Tagihan Select

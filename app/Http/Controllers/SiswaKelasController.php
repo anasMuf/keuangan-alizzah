@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SIAKAD\Siswa;
 use App\Helpers\LogPretty;
 use App\Models\SIAKAD\Kelas;
+use App\Models\SIAKAD\Siswa;
+use App\Models\TagihanSiswa;
+use Illuminate\Http\Request;
 use App\Models\SIAKAD\SiswaKelas;
 use App\Models\SIAKAD\TahunAjaran;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -122,6 +123,7 @@ class SiswaKelasController extends Controller
         DB::beginTransaction();
         try {
             $siswaKelas = SiswaKelas::findOrFail($id);
+            TagihanSiswa::where('siswa_kelas_id', $siswaKelas->id)->delete();
             $siswaKelas->delete();
 
             DB::commit();

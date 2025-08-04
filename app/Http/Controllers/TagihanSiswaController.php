@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bulan;
 use App\Helpers\LogPretty;
 use App\Models\SIAKAD\Desa;
 use App\Models\PosPemasukan;
@@ -12,8 +13,8 @@ use App\Models\SiswaDispensasi;
 use App\Models\SIAKAD\SiswaKelas;
 use App\Models\SIAKAD\TahunAjaran;
 use Illuminate\Support\Facades\DB;
-use App\Services\TagihanSiswaService;
 use Illuminate\Support\Facades\Log;
+use App\Services\TagihanSiswaService;
 use Illuminate\Support\Facades\Validator;
 
 class TagihanSiswaController extends Controller
@@ -42,6 +43,7 @@ class TagihanSiswaController extends Controller
         $data['siswa'] = null;
         $data['siswaKelas'] = null;
 
+        $bulanSekarang = Bulan::where('angka_bulan', date('n'))->first();
         if($request->siswa_id) {
             // Ambil tahun ajaran aktif
             $tahunAjaran = TahunAjaran::where('is_aktif', true)->first();
@@ -53,8 +55,8 @@ class TagihanSiswaController extends Controller
             $data['siswaKelas'] = $siswaKelas;
             $siswaKelasId = $siswaKelas->id;
 
-            // Query tagihan siswa berdasarkan siswa_kelas_id
-            $tagihanSiswa = TagihanSiswa::with([
+            // Query tagihan siswa berdasarkan siswa_kelas_id dan logika bulan_id
+            $tagihanSiswaQuery = TagihanSiswa::with([
                 'tahun_ajaran',
                 'bulan',
                 'pos_pemasukan',
@@ -63,8 +65,24 @@ class TagihanSiswaController extends Controller
                 'siswa_dispensasi.kategori_dispensasi'
             ])
             ->where('tahun_ajaran_id', $tahunAjaran->id)
-            ->where('siswa_kelas_id', $siswaKelasId)
-            ->get();
+            ->where('siswa_kelas_id', $siswaKelasId);
+
+            if (!isset($request->bulan_id)) {
+                // Tidak ada bulan_id, ambil bulan sekarang saja
+                $tagihanSiswaQuery->where(function($q) use ($bulanSekarang){
+                    $q->where('bulan_id', $bulanSekarang->id)
+                    ->orWhereNull('bulan_id');
+                });
+            } elseif (isset($request->bulan_id) && $request->bulan_id !== 'all') {
+                // Ada bulan_id dan bukan 'all', ambil sesuai request
+                $tagihanSiswaQuery->where(function($q) use ($request){
+                    $q->where('bulan_id', $request->bulan_id)
+                    ->orWhereNull('bulan_id');
+                });
+            }
+            // Jika bulan_id == 'all', tidak perlu filter bulan_id
+
+            $tagihanSiswa = $tagihanSiswaQuery->get();
 
 
             $btnDelete = '';
@@ -128,6 +146,8 @@ class TagihanSiswaController extends Controller
             })
             ->whereHas('siswa')
             ->get();
+        $data['bulans'] = Bulan::all();
+        $data['bulanSekarang'] = $bulanSekarang;
 
         return view('pages.tagihan_siswa.index', $data);
     }

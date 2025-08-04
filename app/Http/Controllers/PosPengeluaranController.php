@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pos;
 use App\Helpers\LogPretty;
 use Illuminate\Support\Str;
+use App\Models\PosPemasukan;
 use Illuminate\Http\Request;
 use App\Models\PosPengeluaran;
 use Illuminate\Support\Facades\DB;
@@ -15,17 +16,19 @@ class PosPengeluaranController extends Controller
     public function index() {
         $data['heads'] = [
             ['label' => 'No', 'width' => 4],
-            'Nama Pos Pengeluaran',
+            'Nama Pos',
+            'Nama Pos Pengeluaran/Sub Pos',
             // 'Nominal',
             ['label' => 'Actions', 'no-export' => true, 'width' => 5],
         ];
 
-        $pos_pengeluaran =  PosPengeluaran::get();
+        $pos_pengeluaran =  PosPengeluaran::with('pos_pemasukan')->get();
 
         $data['config'] = [
             'data' => [],
             'order' => [[0, 'asc']],
             'columns' => [
+                null,
                 null,
                 null,
                 // null,
@@ -48,6 +51,7 @@ class PosPengeluaranController extends Controller
 
             $data['config']['data'][] = [
                 $no++,
+                $item->pos_pemasukan->nama_pos_pemasukan,
                 $item->nama_pos_pengeluaran,
                 // 'Rp '.number_format($item->nominal_valid,0,',','.'),
                 '<nobr>'.$btnDelete.$btnDetails.'</nobr>'
@@ -69,6 +73,17 @@ class PosPengeluaranController extends Controller
             'beban_operasional' => Str::replace('_', ' ', Str::title('beban_operasional')),
             'beban_administrasi' => Str::replace('_', ' ', Str::title('beban_administrasi')),
         ];
+
+        $resultPosPemasukan = [];
+        foreach (PosPemasukan::get()->toArray() as $item) {
+            $resultPosPemasukan[$item['id']] = $item['nama_pos_pemasukan'];
+        }
+        $data['pos_pemasukan'] = $resultPosPemasukan;
+        $posPemasukanSelected = [];
+        if($data['data']){
+            $posPemasukanSelected[] = (string)$data['data']->pos_pemasukan_id;
+        }
+        $data['posPemasukanSelected'] = $posPemasukanSelected;
         return view('pages.pos_pengeluaran.form',$data);
     }
 

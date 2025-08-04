@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\JenjangController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\PemasukanController;
 use App\Http\Controllers\ReferensiController;
@@ -16,12 +17,14 @@ use App\Http\Controllers\SiswaMutasiController;
 use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\PosPemasukanController;
 use App\Http\Controllers\TagihanSiswaController;
+use App\Http\Controllers\TabunganSiswaController;
 use App\Http\Controllers\PosPengeluaranController;
 use App\Http\Controllers\SiswaKelulusanController;
 use App\Http\Controllers\SiswaNaikKelasController;
 use App\Http\Controllers\SiswaDispensasiController;
 use App\Http\Controllers\SiswaPindahKelasController;
 use App\Http\Controllers\KategoriDispensasiController;
+use App\Http\Controllers\SiswaEkstrakulikulerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -138,6 +141,20 @@ Route::middleware('auth')->group(function(){
         Route::post('/store','store')->name('.store');
         Route::delete('/delete/{id}','delete')->name('.delete');
     });
+
+    Route::prefix('/siswa-ekstrakulikuler')->as('siswa_ekstrakulikuler')->controller(SiswaEkstrakulikulerController::class)->group(function(){
+        Route::get('/', 'index')->name('.main');
+        Route::get('/form','/form')->name('.form');
+        Route::post('/store','store')->name('.store');
+        Route::delete('/delete/{id}','delete')->name('.delete');
+    });
+
+    Route::prefix('/siswa-daycare')->as('siswa_daycare')->controller(SiswaEkstrakulikulerController::class)->group(function(){
+        Route::get('/', 'index')->name('.main');
+        Route::get('/form','/form')->name('.form');
+        Route::post('/store','store')->name('.store');
+        Route::delete('/delete/{id}','delete')->name('.delete');
+    });
     // KESISWAAN END
 
     // POS START
@@ -196,7 +213,20 @@ Route::middleware('auth')->group(function(){
         Route::post('/store','store')->name('.store');
         Route::delete('/delete/{id}','delete')->name('.delete');
     });
+    Route::prefix('/tabungan-siswa')->as('tabungan_siswa')->controller(TabunganSiswaController::class)->group(function(){
+        Route::get('/','index')->name('.main');
+        Route::get('/{siswa_id}','siswa')->name('.siswa');
+        Route::get('/add','add')->name('.add');
+        Route::get('/form','form')->name('.form');
+        Route::post('/store','store')->name('.store');
+        Route::delete('/delete/{id}','delete')->name('.delete');
+    });
     // TRANSAKSI END
 
-
+    // LAPORAN START
+    Route::prefix('/laporan')->as('laporan')->controller(LaporanController::class)->group(function(){
+        Route::get('/','index')->name('.main');
+        Route::post('/generate','generate')->name('.generate');
+    });
+    // LAPORAN END
 });

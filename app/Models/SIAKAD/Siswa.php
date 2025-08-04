@@ -83,6 +83,7 @@ class Siswa extends Model
 
     public function getSaldoTabunganAttribute()
     {
-        return $this->tabungan_siswa()->sum('nominal');
+        $lastTabungan = $this->tabungan_siswa()->orderByDesc('id')->first();
+        return $lastTabungan ? $lastTabungan->saldo : 0;
     }
 }

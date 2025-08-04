@@ -176,13 +176,13 @@ class PosPemasukanController extends Controller
             'nominal_valid' => 'Nominal',
         ];
 
-        // if((boolean)$request->jenis){
+        if(!$request->nominal_perjenjang){
             $rules['nominal_valid'] = 'required|numeric';
-        // }else{
-        //     $request->merge([
-        //         'nominal_valid' => 0,
-        //     ]);
-        // }
+        }else{
+            $request->merge([
+                'nominal_valid' => 0,
+            ]);
+        }
 
         $request->merge([
             'pos_id' => 1,
@@ -197,6 +197,13 @@ class PosPemasukanController extends Controller
                 'message_validation' => $validator->getMessageBag()
             ]);
         }
+
+        $request->merge([
+            'hari_aktif' => isset($request->hari_aktif) ? true : false,
+            'tabungan' => $request->tabungan ? true : false,
+            'optional' => $request->optional ? true : false,
+            'is_nominal_varian' => $request->nominal_perjenjang ? true : false,
+        ]);
 
         DB::beginTransaction();
         try {

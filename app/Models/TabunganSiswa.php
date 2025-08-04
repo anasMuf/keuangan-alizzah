@@ -15,6 +15,13 @@ class TabunganSiswa extends Model
     protected $table = 'tabungan_siswa';
     protected $guarded = ['id'];
 
+    protected $appends = ['saldo'];
+
+    public function getSaldoAttribute()
+    {
+        return ($this->saldo + $this->debit) - $this->kredit;
+    }
+
     public function siswa()
     {
         return $this->belongsTo(Siswa::class, 'siswa_id', 'id');

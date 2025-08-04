@@ -18,6 +18,10 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'version' => env('APP_VERSION', '1.0.0'),
+    'company_url' => env('COMPANY_URL', 'https://al-izzah.sch.id'),
+    'company_name' => env('COMPANY_NAME', 'Al-Izzah'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tabungan_siswa', function (Blueprint $table) {
+        Schema::create('siswa_ekstrakulikuler', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->references('id')->on('siakad_alizzah.siswa')->cascadeOnDelete();
-            $table->date('tanggal')->default(now());
+            $table->foreignId('siswa_kelas');
+            $table->foreignId('pos_pemasukan_id')
+                ->references('id')->on('pos_pemasukan')
+                ->cascadeOnDelete();
             $table->text('keterangan')->nullable();
-            $table->decimal('debit', 15, 2)->default(0);
-            $table->decimal('kredit', 15, 2)->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tabungan_siswa');
+        Schema::dropIfExists('siswa_ekstrakulikuler');
     }
 };
