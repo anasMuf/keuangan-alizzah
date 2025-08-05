@@ -91,15 +91,15 @@ class EventServiceProvider extends ServiceProvider
                         'active' => ['siswa-kelulusan/form', 'siswa-kelulusan/form*', 'regex:@^siswa-kelulusan/form/[0-9]+$@'],
                     ],
                     [
-                        'text' => 'Ekstrakulikuler Siswa',
+                        'text' => 'Ekstrakulikuler/Daycare Siswa',
                         'route' => 'siswa_ekstrakulikuler.main',
                         'active' => ['siswa-ekstrakulikuler/form', 'siswa-ekstrakulikuler/form*', 'regex:@^siswa-ekstrakulikuler/form/[0-9]+$@'],
                     ],
-                    [
-                        'text' => 'Daycare Siswa',
-                        'route' => 'siswa_daycare.main',
-                        'active' => ['siswa-daycare/form', 'siswa-daycare/form*', 'regex:@^siswa-daycare/form/[0-9]+$@'],
-                    ]
+                    // [
+                    //     'text' => 'Daycare Siswa',
+                    //     'route' => 'siswa_daycare.main',
+                    //     'active' => ['siswa-daycare/form', 'siswa-daycare/form*', 'regex:@^siswa-daycare/form/[0-9]+$@'],
+                    // ]
                 ]
             ]);
             $event->menu->add([

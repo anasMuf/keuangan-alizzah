@@ -2,9 +2,9 @@
 
 {{-- Customize layout sections --}}
 
-@section('subtitle', 'Tagihan Siswa')
+@section('subtitle', 'Ekstrakulikuler Siswa')
 @section('content_header_title', 'Home')
-@section('content_header_subtitle', 'Tagihan Siswa')
+@section('content_header_subtitle', 'Ekstrakulikuler Siswa')
 @section('plugins.Datatables', true)
 @section('plugins.Select2', true)
 
@@ -12,7 +12,7 @@
 
 @section('content_body')
 
-<x-adminlte-card title="Data Siswa">
+<x-adminlte-card title="Data Ekstrakulikuler Siswa">
 
     @if (session('message'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -38,34 +38,17 @@
     <div class="action mb-3 row">
         <div class="col-md-6 action-list d-flex align-items-center">
             @if($siswaKelas)
-            <a href="{{ route('tagihan_siswa.form',['siswa_id' => $siswaKelas->siswa_id]) }}" class="btn btn-primary">Tambah Tagihan</a>
+            <a href="{{ route('siswa_ekstrakulikuler.form',['siswa_id' => $siswaKelas->siswa_id]) }}" class="btn btn-primary">Tambah Ekstrakulikuler</a>
             @endif
-            {{-- generate tagihan siswa --}}
-            <a href="{{ route('tagihan_siswa.generate') }}" onclick="return confirm('Apakah Anda yakin ingin memperbarui tagihan siswa?')" class="btn btn-warning ml-2">Perbarui Tagihan Siswa</a>
         </div>
         <div class="col-md-6 filter">
-            <form action="{{ route('tagihan_siswa.main') }}" method="get" class="d-flex justify-content-around" id="filter">
+            <form action="{{ route('siswa_ekstrakulikuler.main') }}" method="get" class="d-flex justify-content-around" id="filter">
                 <div class="form-group">
                     <label for="siswa_id" class="mr-2">Siswa:</label>
                     <select name="siswa_id" id="siswa_id" class="form-control select2">
                         <option value="">.:: Pilih Siswa :..</option>
                         @foreach($siswa_kelas as $sk)
                             <option value="{{ $sk->siswa->id }}" {{ request('siswa_id') == $sk->siswa->id ? 'selected' : '' }}>{{ $sk->siswa->nama_lengkap }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="bulan_id" class="mr-2">Bulan:</label>
-                    <select name="bulan_id" id="bulan_id" class="form-control select2">
-                        <option value="all" {{ request('bulan_id') == 'all' ? 'selected' : '' }}>Semua Bulan</option>
-                        @foreach($bulans as $b)
-                            <option value="{{ $b->id }}"
-                                @if(request('bulan_id'))
-                                    {{ request('bulan_id') == $b->id ? 'selected' : '' }}
-                                @else
-                                    {{ (isset($bulanSekarang) && $bulanSekarang->id == $b->id) ? 'selected' : '' }}
-                                @endif
-                            >{{ $b->nama_bulan }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -110,7 +93,6 @@
             allowClear: true
         });
         $('#siswa_id').change(() => $('#filter').submit())
-        $('#bulan_id').change(() => $('#filter').submit())
 
         function deleteData(id,nama){
             Swal.fire({
@@ -126,7 +108,7 @@
 
                     $.ajax({
                         type: "delete",
-                        url: "/tagihan_siswa/delete/"+id,
+                        url: "/siswa-ekstrakulikuler/delete/"+id,
                         data: {
                             "_token": "{{ csrf_token() }}"
                         },
@@ -142,7 +124,7 @@
                                     timer: timer
                                 });
                                 setTimeout(() => {
-                                    location.href = "/tagihan_siswa?siswa_id="+$('#siswa_id').val();
+                                    location.href = "/siswa-ekstrakulikuler?siswa_id="+$('#siswa_id').val();
                                 }, timer);
                             }else{
                                 Swal.fire('Peringatan', response.message, 'warning')

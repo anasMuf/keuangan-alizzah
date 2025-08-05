@@ -45,12 +45,12 @@ class Pemasukan extends Model
     }
 
 
-    public static function generateNoTransaksi(): string
+    public static function generateNoTransaksi($tanggal): string
     {
-        $prefix = 'TRXIN-' . date('Ymd') . '-';
+        $prefix = 'TRXIN-' . date('Ymd', strtotime($tanggal)) . '-';
 
         // Hitung transaksi pada hari ini
-        $countToday = self::whereDate('created_at', date('Y-m-d'))->count();
+        $countToday = self::whereDate('tanggal', date('Y-m-d', strtotime($tanggal)))->count();
 
         // Tambah 1 karena yang baru akan disimpan
         $number = str_pad($countToday + 1, 4, '0', STR_PAD_LEFT);

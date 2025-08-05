@@ -19,7 +19,7 @@ class TabunganSiswa extends Model
 
     public function getSaldoAttribute()
     {
-        return ($this->saldo + $this->debit) - $this->kredit;
+        return ($this->debit ?? 0) - ($this->kredit ?? 0);
     }
 
     public function siswa()

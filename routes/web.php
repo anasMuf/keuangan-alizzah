@@ -144,14 +144,7 @@ Route::middleware('auth')->group(function(){
 
     Route::prefix('/siswa-ekstrakulikuler')->as('siswa_ekstrakulikuler')->controller(SiswaEkstrakulikulerController::class)->group(function(){
         Route::get('/', 'index')->name('.main');
-        Route::get('/form','/form')->name('.form');
-        Route::post('/store','store')->name('.store');
-        Route::delete('/delete/{id}','delete')->name('.delete');
-    });
-
-    Route::prefix('/siswa-daycare')->as('siswa_daycare')->controller(SiswaEkstrakulikulerController::class)->group(function(){
-        Route::get('/', 'index')->name('.main');
-        Route::get('/form','/form')->name('.form');
+        Route::get('/form','form')->name('.form');
         Route::post('/store','store')->name('.store');
         Route::delete('/delete/{id}','delete')->name('.delete');
     });

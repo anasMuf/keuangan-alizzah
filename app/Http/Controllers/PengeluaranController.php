@@ -123,11 +123,15 @@ class PengeluaranController extends Controller
 
         DB::beginTransaction();
         try {
+            //custom tanggal
+            $inputDate = date('Y-m-d', strtotime($request->tanggal));
+            $currentTime = date('H:i:s');
+            $tanggal = $inputDate . ' ' . $currentTime;
             // 1. Create Pengeluaran (header)
             $pengeluaran = Pengeluaran::create([
-                'no_transaksi' => Pengeluaran::generateNoTransaksi(), // Buat method ini jika belum ada
+                'no_transaksi' => Pengeluaran::generateNoTransaksi($inputDate), // Buat method ini jika belum ada
                 'tahun_ajaran_id' => TahunAjaran::where('is_aktif', true)->first()->id,
-                'tanggal' => now(),
+                'tanggal' => $tanggal,
                 'total' => 0
             ]);
 
@@ -146,7 +150,7 @@ class PengeluaranController extends Controller
                 PengeluaranPembayaran::create([
                     'pengeluaran_id' => $pengeluaran->id,
                     'pengeluaran_detail_id' => $detail->id,
-                    'tanggal' => now(),
+                    'tanggal' => $tanggal,
                     'nominal' => $item['nominal'],
                     'metode' => 'tunai'
                 ]);
@@ -157,7 +161,7 @@ class PengeluaranController extends Controller
                     'referensi_id' => $detail->id,
                     'tipe' => 'out',
                     'jenis_akun' => 'beban',
-                    'trx_date' => now(),
+                    'trx_date' => $tanggal,
                     'keterangan' => 'Pengeluaran',
                     'debit' => 0,
                     'kredit' => $item['nominal']

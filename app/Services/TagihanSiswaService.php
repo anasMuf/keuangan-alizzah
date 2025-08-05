@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class TagihanSiswaService
 {
-    public function create(array $data, $customPos = null) : array
+    public function create(array $data, $customPos = null, $nominalBerbeda = 0) : array
     {
         //cek isi pos_pemasukan ada atau tidak
         if(PosPemasukan::whereIn('pembayaran',['sekali','harian','mingguan','bulanan','tahunan'])->count() > 0) {
@@ -33,11 +33,14 @@ class TagihanSiswaService
                 ];
             }
             foreach($posPemasukan as $itemPosPemasukan) {
-                $nominal = $itemPosPemasukan->nominal_valid;
+                $nominal = $nominalBerbeda == 0 ? $itemPosPemasukan->nominal_valid : $nominalBerbeda;
+                LogPretty::info('nominal', $nominal);
                 $existingTagihan = TagihanSiswa::where('siswa_kelas_id', $siswa_kelas_id)
                     ->where('pos_pemasukan_id', $itemPosPemasukan->id)
                     ->where('tahun_ajaran_id', $data['tahun_ajaran_id'])
+                    ->orderBy('jumlah_harus_dibayar', 'desc')
                     ->first();
+                $jumlah_harus_dibayar_terakhir = $existingTagihan ? $existingTagihan->jumlah_harus_dibayar : 0;
                 // // apakah kelas siswa ini biaya_awal true
                 $kelasBiayaAwal = true;
                 // // jika biaya awal, maka buat tagihan
@@ -47,11 +50,20 @@ class TagihanSiswaService
                     //     $existingTagihan = null; // set existingTagihan ke null agar tagihan dibuat
                     // }
                 };
+                // jika itemPosPemasukan->wajib == true, dan itemPosPemasukan->optional == true, maka buat tagihan siswa
+                if($itemPosPemasukan->wajib && $itemPosPemasukan->optional) {
+                    LogPretty::info('Cek pos pemasukan wajib dan optional', [
+                        'wajib' => $itemPosPemasukan->wajib,
+                        'optional' => $itemPosPemasukan->optional,
+                    ]);
+                    $existingTagihan = null; // set existingTagihan ke null agar tagihan dibuat
+                }
                 LogPretty::info('Cek tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan, [
                     'kelas_biaya_awal' => $kelasBiayaAwal,
                     'existing_tagihan' => $existingTagihan,
                 ]);
                 if(!$existingTagihan && $kelasBiayaAwal) {
+                    LogPretty::info('Membuat tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan . ' dengan id: ' . $itemPosPemasukan->id);
                     foreach($itemPosPemasukan->jenjang_pos_pemasukan as $itemJenjangPosPemasukan) {
                         if($itemJenjangPosPemasukan->jenjang_pos_pemasukan_detail){
                             foreach($itemJenjangPosPemasukan->jenjang_pos_pemasukan_detail as $itemJenjangPosPemasukanDetail){
@@ -73,6 +85,10 @@ class TagihanSiswaService
                         // cek jenjang_pos_pemasukan->jenjang_id == siswa_kelas->kelas->jenjang_id
                         $jenjangIdSiswa = $data['siswa_kelas']['kelas']['jenjang_id'];
                         $jenjangIdPosPemasukan = $itemJenjangPosPemasukan->jenjang_id;
+                        LogPretty::info('Cek jenjang pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan, [
+                            'jenjang_id_siswa' => $jenjangIdSiswa,
+                            'jenjang_id_pos_pemasukan' => $jenjangIdPosPemasukan,
+                        ]);
                         if($jenjangIdSiswa == $jenjangIdPosPemasukan) {
                             // cek pos_pemasukan yang attribut pembayaran == 'bulanan'
                             if($itemPosPemasukan->pembayaran == 'bulanan') {
@@ -109,6 +125,11 @@ class TagihanSiswaService
                                 LogPretty::info('Membuat tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan);
                             }else{
                                 // jika pembayaran sekali
+                                $jumlah_harus_dibayar = $jumlah_harus_dibayar_terakhir;
+                                if($itemPosPemasukan->pembayaran == 'harian') {
+                                    $jumlah_harus_dibayar++; // jika harian, maka 30 hari
+                                }
+                                LogPretty::info('Membuat tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan . ' dengan id: ' . $itemPosPemasukan->id);
                                 $tagihanSiswaService = new TagihanSiswa();
                                 $tagihanSiswaService->create([
                                     'tahun_ajaran_id' => $data['tahun_ajaran_id'],
@@ -122,15 +143,39 @@ class TagihanSiswaService
                                     'diskon_persen' => $persentase_overide,
                                     'diskon_nominal' => $nominal_overide,
                                     'nominal' => $totalNominal,
-                                    'jumlah_harus_dibayar' => 1,
+                                    'jumlah_harus_dibayar' => $jumlah_harus_dibayar,
                                     'status' => 'belum_bayar',
                                     'keterangan' => '',
                                 ]);
                                 Log::info('Kelas biaya awal: ' . $kelasBiayaAwal);
-                                LogPretty::info('Membuat tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan);
+                                LogPretty::info('Berhasil Membuat tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan);
                             }
+                        }else {
+                            continue;
+                            LogPretty::info('Gagal, Jenjang pos pemasukan tidak sesuai dengan jenjang siswa kelas, melewati pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan);
+                            // return [
+                            //     'success' => false,
+                            //     'message' => 'Tagihan siswa gagal dibuat. pos pemasukan ' . $itemPosPemasukan->nama_pos_pemasukan . ' tidak sesuai dengan jenjang siswa kelas.',
+                            // ];
                         }
                     }
+                }else{
+                    //update tagihan siswa jika sudah ada
+                    LogPretty::info('Tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan . ' sudah ada, update tagihan siswa');
+                    // $tagihanSiswaService = TagihanSiswa::where('siswa_kelas_id', $siswa_kelas_id)
+                    //     ->where('pos_pemasukan_id', $itemPosPemasukan->id)
+                    //     ->where('tahun_ajaran_id', $data['tahun_ajaran_id'])
+                    //     ->orderBy('jumlah_harus_dibayar', 'desc')
+                    //     ->first();
+
+                    // $tagihanSiswaService->update([
+                    //     'siswa_dispensasi_id' => $siswa_dispensasi_id,
+                    //     'nominal_awal' => $nominal,
+                    //     'diskon_persen' => $persentase_overide,
+                    //     'diskon_nominal' => $nominal_overide,
+                    //     'nominal' => $totalNominal,
+                    // ]);
+                    // LogPretty::info('Berhasil update tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan);
                 }
             }
             return [

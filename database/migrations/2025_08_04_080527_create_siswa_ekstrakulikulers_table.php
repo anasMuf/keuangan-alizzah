@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('siswa_ekstrakulikuler', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_kelas');
+            $table->foreignId('siswa_kelas_id')
+                ->references('id')->on('siakad_alizzah.siswa_kelas')
+                ->cascadeOnDelete();
             $table->foreignId('pos_pemasukan_id')
                 ->references('id')->on('pos_pemasukan')
                 ->cascadeOnDelete();
             $table->text('keterangan')->nullable();
+            $table->integer('ke')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

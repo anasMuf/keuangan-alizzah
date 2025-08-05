@@ -24,6 +24,7 @@ class TagihanSiswaController extends Controller
         $data['heads'] = [
             ['label' => 'No', 'width' => 4],
             'Bulan',
+            'Tagihan ke',
             'Pos Pemasukan',
             'Dispensasi',
             'Nilai Dispensasi',
@@ -35,7 +36,7 @@ class TagihanSiswaController extends Controller
         $data['config'] = [
             'data' => [],
             'order' => [[0, 'asc']],
-            'columns' => [null, null, null, null, null, null, null, ['orderable' => false]]
+            'columns' => [null, null, null, null, null, null, null, null, ['orderable' => false]]
         ];
         $data['config']['paging'] = false;
         $data['config']["lengthMenu"] = [ 50, 100, 500];
@@ -128,6 +129,7 @@ class TagihanSiswaController extends Controller
                 $data['config']['data'][] = [
                     $no++,
                     $item->bulan->nama_bulan ?? '-',
+                    $item->jumlah_harus_dibayar ?? '-',
                     $item->pos_pemasukan->nama_pos_pemasukan ?? '-',
                     $dispensasi,
                     $nilaiDispensasi,
@@ -228,7 +230,7 @@ class TagihanSiswaController extends Controller
                 'siswa_dispensasi' => $siswaKelas['siswa']['siswa_dispensasi'] ?? [],
             ];
             // return $dataTagihan;
-            $resultTagihan = $tagihanSiswaService->create($dataTagihan, $request->pos_pemasukan_id);
+            $resultTagihan = $tagihanSiswaService->create($dataTagihan, $request->pos_pemasukan_id,$request->nominal);
             if(!$resultTagihan['success']) {
                 DB::rollBack();
                 LogPretty::error('Gagal membuat tagihan siswa, id: ' . $request->siswa_kelas_id . ': ' . $resultTagihan['message']);
@@ -245,7 +247,7 @@ class TagihanSiswaController extends Controller
             ]);
         } catch (\Throwable $th) {
             DB::rollBack();
-            LogPretty::error('Gagal menyimpan tagihan siswa: ' . $th->getMessage());
+            LogPretty::error($th);
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyimpan tagihan siswa: ' . $th->getMessage()
@@ -259,7 +261,7 @@ class TagihanSiswaController extends Controller
         // This is a placeholder for the actual implementation
         // You can find the tagihan by ID and delete it from the database
 
-        return response()->json(['message' => 'Tagihan Siswa deleted successfully']);
+        return response()->json(['message' => 'Tagihan Siswa delete masih maintenance']);
     }
 
     public function generateTagihanSiswa()

@@ -94,6 +94,10 @@
                         @csrf
                         <input type="hidden" id="siswa-kelas-id" name="siswa_kelas_id">
                         <input type="hidden" id="item-transaksi" name="item_transaksi">
+                        <div class="form-group">
+                            <label for="tanggal">Tanggal</label>
+                            <input type="date" name="tanggal" class="form-control" id="tanggal" value="{{ old('tanggal', date('Y-m-d')) }}" placeholder="Tanggal...">
+                        </div>
 
                         <!-- Container Item Transaksi -->
                         <div id="item-transaksi-container"></div>
@@ -598,6 +602,7 @@ function handleFormSubmit() {
 
         const formData = {
             siswa_kelas_id: selectedSiswaKelas,
+            tanggal: $('#tanggal').val(),
             item_transaksi: itemTransaksi
         };
 

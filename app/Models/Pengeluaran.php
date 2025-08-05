@@ -23,12 +23,12 @@ class Pengeluaran extends Model
         return $this->belongsTo(TahunAjaran::class, 'tahun_ajaran_id');
     }
 
-    public static function generateNoTransaksi(): string
+    public static function generateNoTransaksi($tanggal): string
     {
-        $prefix = 'TRXOUT-' . date('Ymd') . '-';
+        $prefix = 'TRXOUT-' . date('Ymd', strtotime($tanggal)) . '-';
 
         // Hitung transaksi pada hari ini
-        $countToday = self::whereDate('created_at', date('Y-m-d'))->count();
+        $countToday = self::whereDate('created_at', date('Y-m-d', strtotime($tanggal)))->count();
 
         // Tambah 1 karena yang baru akan disimpan
         $number = str_pad($countToday + 1, 4, '0', STR_PAD_LEFT);

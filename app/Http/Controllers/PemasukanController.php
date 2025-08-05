@@ -150,12 +150,16 @@ class PemasukanController extends Controller
 
         DB::beginTransaction();
         try {
+            //custom tanggal
+            $inputDate = date('Y-m-d', strtotime($request->tanggal));
+            $currentTime = date('H:i:s');
+            $tanggal = $inputDate . ' ' . $currentTime;
             // 1. Create Pemasukan
             $pemasukan = Pemasukan::create([
-                'no_transaksi' => Pemasukan::generateNoTransaksi(),
+                'no_transaksi' => Pemasukan::generateNoTransaksi($inputDate),
                 'siswa_kelas_id' => $request->siswa_kelas_id,
                 'tahun_ajaran_id' => TahunAjaran::where('is_aktif', true)->first()->id,
-                'tanggal' => now(),
+                'tanggal' => $tanggal,
                 'total' => 0
             ]);
             $siswakelas = SiswaKelas::find($request->siswa_kelas_id);
@@ -205,7 +209,7 @@ class PemasukanController extends Controller
                     PemasukanPembayaran::create([
                         'pemasukan_id' => $pemasukan->id,
                         'pemasukan_detail_id' => $pemasukan_detail->id,
-                        'tanggal' => now(),
+                        'tanggal' => $tanggal,
                         'nominal' => $item['dibayar'],
                         'metode' => 'tunai',
                     ]);
@@ -255,7 +259,7 @@ class PemasukanController extends Controller
                     PemasukanPembayaran::create([
                         'pemasukan_id' => $pemasukan->id,
                         'pemasukan_detail_id' => $pemasukan_detail->id,
-                        'tanggal' => now(),
+                        'tanggal' => $tanggal,
                         'nominal' => $item['dibayar'],
                         'metode' => 'tunai',
                     ]);
@@ -296,7 +300,7 @@ class PemasukanController extends Controller
                     PemasukanPembayaran::create([
                         'pemasukan_id' => $pemasukan->id,
                         'pemasukan_detail_id' => $pemasukan_detail->id,
-                        'tanggal' => now(),
+                        'tanggal' => $tanggal,
                         'nominal' => $item['dibayar'],
                         'metode' => 'tunai',
                     ]);
@@ -306,7 +310,7 @@ class PemasukanController extends Controller
                         TabunganSiswa::create([
                             'siswa_id' => $siswaid,
                             'nominal' => $item['dibayar'],
-                            'tanggal' => now(),
+                            'tanggal' => $tanggal,
                         ]);
                     }
 
@@ -325,7 +329,7 @@ class PemasukanController extends Controller
                 'referensi_id' => $pemasukan->id,
                 'tipe' => 'in',
                 'jenis_akun' => 'pendapatan',
-                'trx_date' => now(),
+                'trx_date' => $tanggal,
                 'keterangan' => 'Pembayaran siswa',
                 'debit' => $totalDibayar,
                 'kredit' => 0

@@ -49,10 +49,16 @@
                     <h3 class="card-title">Input Pengeluaran</h3>
                 </div>
                 <div class="card-body">
-                    <div class="item-transaction" id="item-transaction-container"></div>
                     <form id="formData">
                         @csrf
                         <input type="hidden" id="item-transaksi" name="item_transaksi">
+
+                        <div class="form-group">
+                            <label for="tanggal">Tanggal</label>
+                            <input type="date" class="form-control" id="tanggal" name="tanggal" value="{{ old('tanggal', date('Y-m-d')) }}" required>
+                        </div>
+
+                        <div class="item-transaction" id="item-transaction-container"></div>
 
                         <!-- Total Nominal -->
                         <div class="row mt-4">
@@ -332,6 +338,7 @@ function handleFormSubmit() {
         }
 
         const formData = {
+            tanggal: $('#tanggal').val(),
             items:  JSON.stringify(selectedItems)
         };
 
