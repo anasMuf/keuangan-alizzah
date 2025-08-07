@@ -17,7 +17,7 @@ class Siswa extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['alamat_lengkap_format', 'alamat_lengkap_string_format','saldo_tabungan'];
+    protected $appends = ['alamat_lengkap_format', 'alamat_lengkap_string_format'];//,'saldo_tabungan'];
 
     // protected $casts = [
     //     'tanggal_lahir' => 'date'
@@ -81,9 +81,9 @@ class Siswa extends Model
         return $alamat;
     }
 
-    public function getSaldoTabunganAttribute()
-    {
-        $lastTabungan = $this->tabungan_siswa()->orderByDesc('id')->first();
-        return $lastTabungan ? $lastTabungan->saldo : 0;
-    }
+    // public function getSaldoTabunganAttribute()
+    // {
+    //     $lastTabungan = $this->tabungan_siswa()->orderByDesc('id')->first();
+    //     return $lastTabungan ? $lastTabungan->saldo : 0;
+    // }
 }

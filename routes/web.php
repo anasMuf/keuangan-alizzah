@@ -208,7 +208,7 @@ Route::middleware('auth')->group(function(){
     });
     Route::prefix('/tabungan-siswa')->as('tabungan_siswa')->controller(TabunganSiswaController::class)->group(function(){
         Route::get('/','index')->name('.main');
-        Route::get('/{siswa_id}','siswa')->name('.siswa');
+        Route::get('/siswa/{siswa_id}','siswa')->name('.siswa');
         Route::get('/add','add')->name('.add');
         Route::get('/form','form')->name('.form');
         Route::post('/store','store')->name('.store');

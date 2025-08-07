@@ -212,7 +212,7 @@ class SiswaEkstrakulikulerController extends Controller
             $resultTagihan = $tagihanSiswaService->create($dataTagihan, $request->pos_pemasukan_id,$request->nominal);
             if(!$resultTagihan['success']) {
                 DB::rollBack();
-                LogPretty::error('Gagal membuat tagihan siswa, id: ' . $request->siswa_kelas_id . ': ' . $resultTagihan['message']);
+                LogPretty::info('Gagal membuat tagihan siswa, id: ' . $request->siswa_kelas_id . ': ' . $resultTagihan['message']);
                 return response()->json([
                     'success' => false,
                     'message' => 'Gagal membuat tagihan siswa: ' . $resultTagihan['message']

@@ -126,7 +126,7 @@
 
                     $.ajax({
                         type: "delete",
-                        url: "/tagihan_siswa/delete/"+id,
+                        url: "/tagihan-siswa/delete/"+id,
                         data: {
                             "_token": "{{ csrf_token() }}"
                         },
@@ -142,7 +142,7 @@
                                     timer: timer
                                 });
                                 setTimeout(() => {
-                                    location.href = "/tagihan_siswa?siswa_id="+$('#siswa_id').val();
+                                    location.href = "/tagihan-siswa?siswa_id="+$('#siswa_id').val();
                                 }, timer);
                             }else{
                                 Swal.fire('Peringatan', response.message, 'warning')

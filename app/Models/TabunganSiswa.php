@@ -15,12 +15,12 @@ class TabunganSiswa extends Model
     protected $table = 'tabungan_siswa';
     protected $guarded = ['id'];
 
-    protected $appends = ['saldo'];
+    // protected $appends = ['saldo'];
 
-    public function getSaldoAttribute()
-    {
-        return ($this->debit ?? 0) - ($this->kredit ?? 0);
-    }
+    // public function getSaldoAttribute()
+    // {
+    //     return $this->debit - $this->kredit;
+    // }
 
     public function siswa()
     {

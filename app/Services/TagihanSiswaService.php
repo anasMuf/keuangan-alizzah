@@ -40,15 +40,25 @@ class TagihanSiswaService
                     ->where('tahun_ajaran_id', $data['tahun_ajaran_id'])
                     ->orderBy('jumlah_harus_dibayar', 'desc')
                     ->first();
-                $jumlah_harus_dibayar_terakhir = $existingTagihan ? $existingTagihan->jumlah_harus_dibayar : 0;
+                $jumlah_harus_dibayar_terakhir = $existingTagihan ? $existingTagihan->jumlah_harus_dibayar : 1;
                 // // apakah kelas siswa ini biaya_awal true
                 $kelasBiayaAwal = true;
                 // // jika biaya awal, maka buat tagihan
-                if($itemPosPemasukan->id == 1 && $posPemasukan->isEmpty()) {
+                if($itemPosPemasukan->id == 1) {
                     $kelasBiayaAwal = $data['siswa_kelas']['kelas']['biaya_awal'];
-                    // if($kelasBiayaAwal) {
-                    //     $existingTagihan = null; // set existingTagihan ke null agar tagihan dibuat
-                    // }
+                    if(!$kelasBiayaAwal && $existingTagihan) {
+                        // Hapus tagihan biaya awal yang sudah ada
+                        TagihanSiswa::where('siswa_kelas_id', $siswa_kelas_id)
+                            ->where('pos_pemasukan_id', 1) // pos biaya awal
+                            ->where('tahun_ajaran_id', $data['tahun_ajaran_id'])
+                            ->where('status', 'belum_bayar') // hanya yang belum dibayar
+                            ->delete();
+
+                        LogPretty::info('Menghapus tagihan biaya awal untuk siswa kelas id ' . $siswa_kelas_id . ' karena kelas biaya_awal = false');
+
+                        // Skip pembuatan tagihan untuk pos ini
+                        continue;
+                    }
                 };
                 // jika itemPosPemasukan->wajib == true, dan itemPosPemasukan->optional == true, maka buat tagihan siswa
                 if($itemPosPemasukan->wajib && $itemPosPemasukan->optional) {

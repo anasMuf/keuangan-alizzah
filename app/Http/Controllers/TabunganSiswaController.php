@@ -12,7 +12,6 @@ class TabunganSiswaController extends Controller
 {
     public function index()
     {
-        return "maintenance mode";
         $data['heads'] = [
             ['label' => 'No', 'width' => 4],
             'Nama Siswa',
@@ -35,6 +34,7 @@ class TabunganSiswaController extends Controller
 
         $btnDelete = '';
         $btnDetails = '';
+        $saldoTabungan = 0;
         $no = 1;
 
         foreach($siswa as $item){
@@ -48,10 +48,14 @@ class TabunganSiswaController extends Controller
                 <i class="fa fa-lg fa-fw fa-eye"></i>
             </a>';
 
+            $tabunganHelper = new \App\Services\TabunganSiswaService();
+            $saldoTabungan = $tabunganHelper->tambahSaldoAkhir($item->tabungan_siswa);
+            $countSaldo = $saldoTabungan->count();
+
             $data['config']['data'][] = [
                 $no++,
                 $item->nama_lengkap,
-                'Rp '.number_format($item->saldo_tabungan, 0, ',', '.'),
+                'Rp '.number_format($saldoTabungan[$countSaldo - 1]->saldo_akhir, 0, ',', '.'),
                 '<nobr>'.$btnDelete.$btnDetails.'</nobr>'
             ];
         }
@@ -59,7 +63,8 @@ class TabunganSiswaController extends Controller
         return view('pages.tabungan_siswa.index', $data);
     }
 
-    public function siswa($siswa_id){
+    public function siswa($siswa_id)
+    {
         $data['heads'] = [
             ['label' => 'No', 'width' => 4],
             'Tanggal',
@@ -68,7 +73,7 @@ class TabunganSiswaController extends Controller
             'Kredit',
         ];
 
-        $tabungan_siswa = TabunganSiswa::with('siswa')->where('siswa_id', $siswa_id)->get();
+        $tabungan_siswa = TabunganSiswa::with('siswa')->where('siswa_id', $siswa_id)->orderBy('tanggal','asc')->get();
 
         $data['config'] = [
             'data' => [],
@@ -85,9 +90,6 @@ class TabunganSiswaController extends Controller
         $no = 1;
 
         foreach($tabungan_siswa as $item){
-            if($item->tabungan_siswa->isEmpty()){
-                continue;
-            }
 
             $data['config']['data'][] = [
                 $no++,
@@ -98,11 +100,19 @@ class TabunganSiswaController extends Controller
             ];
         }
 
-        $data['siswaKelas'] = SiswaKelas::with('siswa','kelas')->where([
-            'tahun_ajaran_id' => TahunAjaran::where('status', 'aktif')->first()->id,
+        $data['siswaKelas'] = SiswaKelas::with('siswa.tabungan_siswa','kelas')->where([
+            'tahun_ajaran_id' => TahunAjaran::where('is_aktif', true)->first()->id,
             'siswa_id' => $siswa_id,
             'status' => 'aktif'
         ])->first();
+
+        $tabunganSiswa = $data['siswaKelas']->siswa->tabungan_siswa ?? collect();
+
+        $tabunganHelper = new \App\Services\TabunganSiswaService();
+        $saldoTabungan = $tabunganHelper->tambahSaldoAkhir($tabunganSiswa);
+        $countSaldo = $saldoTabungan->count();
+
+        $data['totalSaldo'] = $saldoTabungan ? $saldoTabungan[$countSaldo - 1]->saldo_akhir : 0;
 
         return view('pages.tabungan_siswa.siswa', $data);
     }

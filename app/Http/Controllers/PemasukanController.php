@@ -309,7 +309,8 @@ class PemasukanController extends Controller
                     if (isset($item['istabungan']) && $item['istabungan']) {
                         TabunganSiswa::create([
                             'siswa_id' => $siswaid,
-                            'nominal' => $item['dibayar'],
+                            'debit' => $item['dibayar'],
+                            'kredit' => 0,
                             'tanggal' => $tanggal,
                         ]);
                     }

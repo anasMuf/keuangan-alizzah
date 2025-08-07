@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bulan;
+use App\Models\Pemasukan;
 use App\Helpers\LogPretty;
 use App\Models\SIAKAD\Desa;
 use App\Models\PosPemasukan;
 use App\Models\SIAKAD\Kelas;
 use App\Models\TagihanSiswa;
 use Illuminate\Http\Request;
+use App\Models\PemasukanDetail;
 use App\Models\SiswaDispensasi;
 use App\Models\SIAKAD\SiswaKelas;
 use App\Models\SIAKAD\TahunAjaran;
@@ -233,7 +235,7 @@ class TagihanSiswaController extends Controller
             $resultTagihan = $tagihanSiswaService->create($dataTagihan, $request->pos_pemasukan_id,$request->nominal);
             if(!$resultTagihan['success']) {
                 DB::rollBack();
-                LogPretty::error('Gagal membuat tagihan siswa, id: ' . $request->siswa_kelas_id . ': ' . $resultTagihan['message']);
+                LogPretty::info('Gagal membuat tagihan siswa, id: ' . $request->siswa_kelas_id . ': ' . $resultTagihan['message']);
                 return response()->json([
                     'success' => false,
                     'message' => 'Gagal membuat tagihan siswa: ' . $resultTagihan['message']
@@ -257,11 +259,48 @@ class TagihanSiswaController extends Controller
 
     public function delete($id)
     {
-        // Logic to delete tagihan siswa
-        // This is a placeholder for the actual implementation
-        // You can find the tagihan by ID and delete it from the database
+        DB::beginTransaction();
+        try {
+            $tagihanSiswa = TagihanSiswa::with(
+                'pemasukan_detail:id,tagihan_siswa_id,pemasukan_id',
+                'pemasukan_detail.pemasukan:id'
+            )
+            ->where('id', $id)->firstOrFail();
+            $pemasukanDetail = PemasukanDetail::where('tagihan_siswa_id', $tagihanSiswa->id)->first();
+            // update total pemasukan jika pemasukanDetail ada
+            if ($pemasukanDetail) {
+                $pemasukan = Pemasukan::findOrFail($tagihanSiswa->pemasukan_detail->pemasukan->id);
+                $totalSekarang = $pemasukan->total;
+                $totalBaru = $totalSekarang - $tagihanSiswa->nominal;
+                if ($totalBaru < 0) {
+                    DB::rollBack();
+                    LogPretty::info('pemasukan:',$pemasukan);
+                    LogPretty::info('total sekarang:',$totalSekarang);
+                    LogPretty::info('total baru:',$totalBaru);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Gagal menghapus data, total pemasukan tidak boleh kurang dari 0',
+                    ]);
+                }
+                $pemasukan->total -= $tagihanSiswa->nominal;
+                $pemasukan->save();
+                $pemasukanDetail->delete();
+            }
+            $tagihanSiswa->delete();
 
-        return response()->json(['message' => 'Tagihan Siswa delete masih maintenance']);
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil menghapus data',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            LogPretty::error($th);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus data, kesalahan pada sistem',
+            ]);
+        }
     }
 
     public function generateTagihanSiswa()
@@ -292,7 +331,7 @@ class TagihanSiswaController extends Controller
                 $resultTagihan = $tagihanSiswaService->create($dataTagihan);
                 // LogPretty::info('Hasil memperbarui tagihan siswa: ' . json_encode($resultTagihan, JSON_PRETTY_PRINT));
                 if(!$resultTagihan['success']) {
-                    LogPretty::error('Gagal memperbarui tagihan siswa, id: ' . $siswaKelasId . ': ' . $resultTagihan['message']);
+                    LogPretty::info('Gagal memperbarui tagihan siswa, id: ' . $siswaKelasId . ': ' . $resultTagihan['message']);
                 }
             }
 

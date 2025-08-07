@@ -18,7 +18,7 @@
             <h5>Kelas: {{ $siswaKelas->kelas->nama_kelas }}</h5>
         </div>
         <div class="col-md-6 text-right">
-            <h5>Total Tabungan: {{ number_format($siswaKelas->siswa->saldo_tabungan, 0,',','.') }}</h5>
+            <h5>Total Tabungan: Rp {{ number_format($totalSaldo, 0,',','.') }}</h5>
         </div>
     </div>
     <hr>

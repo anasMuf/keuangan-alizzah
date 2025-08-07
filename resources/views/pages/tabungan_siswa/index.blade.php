@@ -13,7 +13,7 @@
 
 <x-adminlte-card title="Data Tabungan Siswa">
     <div class="action mb-3">
-        <a href="{{ route('tabungan_siswa.add') }}" class="btn btn-primary">Tambah Tabungan</a>
+        <p>tambah tabungan bisa langsung ke transaksi dan pilih tabungan umum</p>
     </div>
     <x-adminlte-datatable id="table1" :heads="$heads" :config="$config">
         @foreach($config['data'] as $row)
