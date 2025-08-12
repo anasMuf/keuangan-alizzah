@@ -13,7 +13,7 @@
 
 <x-adminlte-card title="Data Tabungan Siswa">
     <div class="action mb-3">
-        <p>tambah tabungan bisa langsung ke transaksi dan pilih tabungan umum</p>
+        <p>tambah tabungan bisa langsung ke transaksi dan pilih tabungan umum atau lewat detail tabungan siswa dan pilih setor</p>
     </div>
     <x-adminlte-datatable id="table1" :heads="$heads" :config="$config">
         @foreach($config['data'] as $row)
