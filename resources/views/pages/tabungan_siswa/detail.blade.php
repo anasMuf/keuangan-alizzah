@@ -23,8 +23,8 @@
     </div>
     <hr>
     <div class="action mb-3">
-        <a href="{{ route('tabungan_siswa.form',['transaksi' => 'setor']) }}" class="btn btn-primary">Setor</a>
-        <a href="{{ route('tabungan_siswa.form',['transaksi' => 'tarik']) }}" class="btn btn-primary">Tarik</a>
+        <a href="{{ route('tabungan_siswa.form',['siswa_id' => $siswaKelas->siswa->id, 'transaksi' => 'setor']) }}" class="btn btn-success">Setor</a>
+        <a href="{{ route('tabungan_siswa.form',['siswa_id' => $siswaKelas->siswa->id, 'transaksi' => 'tarik']) }}" class="btn btn-danger">Tarik</a>
     </div>
     <x-adminlte-datatable id="table1" :heads="$heads" :config="$config">
         @foreach($config['data'] as $row)
@@ -35,6 +35,8 @@
             </tr>
         @endforeach
     </x-adminlte-datatable>
+
+    <a href="{{ route('tabungan_siswa.main') }}" class="btn btn-default btn-flat">Kembali</a>
 </x-adminlte-card>
 @stop
 

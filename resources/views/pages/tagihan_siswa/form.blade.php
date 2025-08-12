@@ -11,6 +11,14 @@
 @section('content_body')
 
 <x-adminlte-card title="Form Tagihan Siswa">
+    <div class="detail-siswa">
+        @if($siswaKelas)
+            <h5>Detail Siswa</h5>
+            <p><strong>Nama:</strong> {{ $siswaKelas->siswa->nama_lengkap }}</p>
+            <p><strong>Kelas:</strong> {{ $siswaKelas->kelas->nama_kelas }}</p>
+            <p><strong>Tahun Ajaran:</strong> {{ $siswaKelas->tahun_ajaran->nama_tahun_ajaran }}</p>
+        @endif
+    </div>
     <form action="" method="post" id="formData">
         @csrf
         <input type="hidden" name="id_tagihan" id="id_tagihan" value="{{ $data ? old('id_tagihan',$data->id) : old('id_tagihan') }}">

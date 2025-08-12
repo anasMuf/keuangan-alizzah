@@ -55,7 +55,7 @@
             </form>
         </div>
     </div>
-    <div class="detail-siswa"></div>
+    <div class="detail-siswa">
         @if($siswaKelas)
             <h5>Detail Siswa</h5>
             <p><strong>Nama:</strong> {{ $siswaKelas->siswa->nama_lengkap }}</p>
