@@ -199,6 +199,9 @@ Route::middleware('auth')->group(function(){
 
         Route::get('/generate', 'generateTagihanSiswa')->name('.generate');
         Route::put('/update-dispensasi', 'updateDispensasi')->name('.update_dispensasi');
+
+        Route::get('/pos-pemasukan/{id}', 'getTagihanSiswaByPosPemasukan')->name('.pos_pemasukan');
+        Route::put('/update-nominal/{id}', 'updateNominal')->name('.update_nominal');
     });
     Route::prefix('/pengeluaran')->as('pengeluaran')->controller(PengeluaranController::class)->group(function(){
         Route::get('/','index')->name('.main');

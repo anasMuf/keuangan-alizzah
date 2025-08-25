@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\LogPretty;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,9 +24,16 @@ class PosPemasukan extends Model
     public function getSaldoTabunganAttribute()
     {
         $saldo = 0;
-        if($this->tabungan){
-            foreach($this->pemasukan_detail as $detail){
-                $saldo += $detail->subtotal;
+        if($this->tabungan && $this->pemasukan_detail->isNotEmpty()){
+            $detail = $this->pemasukan_detail[0];
+            if($detail->pemasukan->siswa_kelas->status == 'aktif'){
+                $tabunganSiswa = $detail->pemasukan->siswa_kelas->siswa->tabungan_siswa ?? collect();
+
+                $tabunganHelper = new \App\Services\TabunganSiswaService();
+                $saldoTabungan = $tabunganHelper->tambahSaldoAkhir($tabunganSiswa);
+                $countSaldo = $saldoTabungan->count();
+
+                $saldo = $saldoTabungan ? $saldoTabungan[$countSaldo - 1]->saldo_akhir : 0;
             }
         }
         return $saldo;

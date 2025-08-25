@@ -34,7 +34,7 @@
             <input type="hidden" name="nominal" id="nominalHidden" value="{{ old('nominal',0) }}">
     </form>
 
-    <a href="{{ route('tagihan_siswa.main') }}" class="btn btn-default btn-flat">Kembali</a>
+    <a href="{{ route('tagihan_siswa.main',['siswa_id' => $siswaKelas->siswa->id]) }}" class="btn btn-default btn-flat">Kembali</a>
 
     <x-adminlte-button form="formData" class="btn-flat" type="submit" label="Submit" theme="success" icon="fas fa-lg fa-save" id="submitButton"/>
 </x-adminlte-card>
@@ -91,7 +91,7 @@
                         timer: timer
                     })
                     setTimeout(() => {
-                        location.href = "{{ route('tagihan_siswa.main') }}"
+                        location.href = "/tagihan-siswa?siswa_id={{ $siswaKelas->siswa->id }}";
                     }, timer);
                 }else{
                     let message = response.message;

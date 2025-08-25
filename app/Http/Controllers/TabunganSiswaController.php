@@ -83,6 +83,7 @@ class TabunganSiswaController extends Controller
             'Keterangan',
             'Debit',
             'Kredit',
+            'Aksi'
         ];
 
         $tabungan_siswa = TabunganSiswa::with('siswa')->where('siswa_id', $siswa_id)->orderBy('tanggal','asc')->get();
@@ -96,19 +97,26 @@ class TabunganSiswaController extends Controller
                 null,
                 null,
                 null,
+                null,
             ]
         ];
 
+        $btnDelete = '';
+        $transaksi = '';
         $no = 1;
 
         foreach($tabungan_siswa as $item){
-
+            $transaksi = ($item->debit > 0) ? 'debit' : 'kredit';
+            $btnDelete = '<button class="btn btn-danger btn-xs mx-1" title="Delete" id="btnDelete" onclick="deleteData('.$item->id.',`'.$item->tanggal.'`,`'.$transaksi.'`)">
+                <i class="fa fa-lg fa-fw fa-trash"></i>
+            </button>';
             $data['config']['data'][] = [
                 $no++,
                 $item->tanggal,
                 $item->keterangan,
                 ($item->debit > 0) ? 'Rp '.number_format($item->debit, 0, ',', '.') : '-',
-                ($item->kredit > 0) ? 'Rp '.number_format($item->kredit, 0, ',', '.') : '-'
+                ($item->kredit > 0) ? 'Rp '.number_format($item->kredit, 0, ',', '.') : '-',
+                '<nobr>'.$btnDelete.'</nobr>'
             ];
         }
 
@@ -239,6 +247,32 @@ class TabunganSiswaController extends Controller
                 'data' => $tabungan_siswa
             ]);
 
+        } catch (\Exception $e) {
+            DB::rollback();
+            LogPretty::error($e);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus data, kesalahan pada sistem',
+            ]);
+        }
+    }
+
+    public function delete($id)
+    {
+        DB::beginTransaction();
+        try {
+            $tabungan_siswa = TabunganSiswa::findOrFail($id);
+            $tabungan_siswa->delete();
+
+            Ledger::where('sumber_tabel', 'tabungan_siswa')
+                ->where('referensi_id', $id)
+                ->delete();
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dihapus',
+            ]);
         } catch (\Exception $e) {
             DB::rollback();
             LogPretty::error($e);

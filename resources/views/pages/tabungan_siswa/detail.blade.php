@@ -51,5 +51,49 @@
 
 @push('js')
     <script>
+        function deleteData(id,tanggal,transaksi){
+            Swal.fire({
+                title: "Data akan dihapus!",
+                html: "Apakah Anda yakin data <strong>"+transaksi+"</strong> tanggal <strong>"+tanggal+"</strong> dihapus?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Tidak',
+                confirmButtonColor: "#d33",
+            }).then(function(result) {
+                if (result.isConfirmed) {
+
+                    $.ajax({
+                        type: "delete",
+                        url: "/tabungan-siswa/delete/"+id,
+                        data: {
+                            "_token": "{{ csrf_token() }}"
+                        },
+                        dataType: "json",
+                        success: function(response) {
+                            if (response.success) {
+                                let timer = 1500
+                                Swal.fire({
+                                    title: "Sukses",
+                                    text: response.message,
+                                    icon: "success",
+                                    showConfirmButton: false,
+                                    timer: timer
+                                });
+                                setTimeout(() => {
+                                    location.href = "/tabungan-siswa/siswa/{{ $siswaKelas->siswa->id }}"
+                                }, timer);
+                            }else{
+                                Swal.fire('Peringatan', response.message, 'warning')
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire('Terjadi Kesalahan', error, 'error')
+                        }
+                    });
+                }
+            });
+        }
+
     </script>
 @endpush

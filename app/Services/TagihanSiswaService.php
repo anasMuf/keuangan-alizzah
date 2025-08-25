@@ -68,6 +68,9 @@ class TagihanSiswaService
                     ]);
                     $existingTagihan = null; // set existingTagihan ke null agar tagihan dibuat
                 }
+                if($customPos != null){
+                    $kelasBiayaAwal = true; // jika customPos, maka set kelasBiayaAwal ke true
+                }
                 LogPretty::info('Cek tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan, [
                     'kelas_biaya_awal' => $kelasBiayaAwal,
                     'existing_tagihan' => $existingTagihan,
@@ -172,20 +175,50 @@ class TagihanSiswaService
                 }else{
                     //update tagihan siswa jika sudah ada
                     LogPretty::info('Tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan . ' sudah ada, update tagihan siswa');
-                    // $tagihanSiswaService = TagihanSiswa::where('siswa_kelas_id', $siswa_kelas_id)
-                    //     ->where('pos_pemasukan_id', $itemPosPemasukan->id)
-                    //     ->where('tahun_ajaran_id', $data['tahun_ajaran_id'])
-                    //     ->orderBy('jumlah_harus_dibayar', 'desc')
-                    //     ->first();
+                    $tagihanSiswaService = TagihanSiswa::where('siswa_kelas_id', $siswa_kelas_id)
+                        ->where('pos_pemasukan_id', $itemPosPemasukan->id)
+                        ->where('tahun_ajaran_id', $data['tahun_ajaran_id'])
+                        ->orderBy('jumlah_harus_dibayar', 'desc')
+                        ->first();
+                    if($tagihanSiswaService) {
+                        foreach($itemPosPemasukan->jenjang_pos_pemasukan as $itemJenjangPosPemasukan) {
+                            if($itemJenjangPosPemasukan->jenjang_pos_pemasukan_detail){
+                                foreach($itemJenjangPosPemasukan->jenjang_pos_pemasukan_detail as $itemJenjangPosPemasukanDetail){
+                                    $jkSiswa = $data['siswa_kelas']['siswa']['jenis_kelamin'];
+                                    $jkJenjangPosPemasukanDetail = $itemJenjangPosPemasukanDetail->jenis_kelamin;
+                                    if($jkSiswa == $jkJenjangPosPemasukanDetail){
+                                        $nominal = $itemJenjangPosPemasukanDetail->nominal;
+                                    }
+                                }
+                            }
+                            if($persentase_overide > 0) {
+                                $totalNominal = $nominal - ($nominal * $persentase_overide);
+                            }elseif($nominal_overide > 0) {
+                                $totalNominal = $nominal - $nominal_overide;
+                            }else{
+                                $totalNominal = $nominal;
+                            }
 
-                    // $tagihanSiswaService->update([
-                    //     'siswa_dispensasi_id' => $siswa_dispensasi_id,
-                    //     'nominal_awal' => $nominal,
-                    //     'diskon_persen' => $persentase_overide,
-                    //     'diskon_nominal' => $nominal_overide,
-                    //     'nominal' => $totalNominal,
-                    // ]);
-                    // LogPretty::info('Berhasil update tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan);
+                            $jenjangIdSiswa = $data['siswa_kelas']['kelas']['jenjang_id'];
+                            $jenjangIdPosPemasukan = $itemJenjangPosPemasukan->jenjang_id;
+                            LogPretty::info('Cek jenjang pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan, [
+                                'jenjang_id_siswa' => $jenjangIdSiswa,
+                                'jenjang_id_pos_pemasukan' => $jenjangIdPosPemasukan,
+                            ]);
+                            if($jenjangIdSiswa == $jenjangIdPosPemasukan) {
+                                $tagihanSiswaService->update([
+                                    'siswa_dispensasi_id' => $siswa_dispensasi_id,
+                                    'nominal_awal' => $nominal,
+                                    'diskon_persen' => $persentase_overide,
+                                    'diskon_nominal' => $nominal_overide,
+                                    'nominal' => $totalNominal,
+                                ]);
+                                LogPretty::info('Berhasil update tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan);
+                            }
+                        }
+                    } else {
+                        LogPretty::info('Tagihan siswa tidak ditemukan untuk diupdate, siswa_kelas_id: ' . $siswa_kelas_id . ', pos_pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan);
+                    }
                 }
             }
             return [

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->boolean('hari_aktif')->default(false);
             $table->decimal('nominal_valid',15,2)->default(0);
             $table->boolean('is_nominal_varian')->default(false);
+            // $table->boolean('is_nominal_varian_siswa')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });

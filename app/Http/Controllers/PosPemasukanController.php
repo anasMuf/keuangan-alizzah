@@ -6,6 +6,7 @@ use App\Models\Pos;
 use App\Models\Bulan;
 use App\Helpers\LogPretty;
 use App\Models\PosPemasukan;
+use App\Models\SIAKAD\Kelas;
 use App\Models\TagihanSiswa;
 use Illuminate\Http\Request;
 use App\Models\SIAKAD\Jenjang;
@@ -14,8 +15,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\JenjangPosPemasukan;
 use Illuminate\Support\Facades\Log;
 use App\Models\JenjangPosPemasukanDetail;
-use App\Models\JenjangPosPemasukanNominal;
 use Illuminate\Support\Facades\Validator;
+use App\Models\JenjangPosPemasukanNominal;
 
 class PosPemasukanController extends Controller
 {
@@ -155,7 +156,28 @@ class PosPemasukanController extends Controller
             "width" => '100%'
         ];
 
-        // return $data['data'];
+        $data['kelas'] = [];
+        $data['jenjangs'] = [];
+
+        if ($data['data']) {
+            // Get kelas berdasarkan jenjang yang terpilih
+            $jenjangIds = $data['data']->jenjang_pos_pemasukan->pluck('jenjang_id');
+
+            $kelas = Kelas::whereIn('jenjang_id', $jenjangIds)
+                ->with('jenjang:id,nama_jenjang')
+                ->get();
+
+            foreach ($kelas as $item) {
+                $data['kelas'][$item->id] = $item->nama_kelas . ' (' . $item->jenjang->nama_jenjang . ')';
+            }
+
+            foreach ($jenjangIds as $jenjangId) {
+                $jenjang = Jenjang::find($jenjangId);
+                if ($jenjang) {
+                    $data['jenjangs'][$jenjang->id] = $jenjang->nama_jenjang;
+                }
+            }
+        }
         return view('pages.pos_pemasukan.form',$data);
     }
 

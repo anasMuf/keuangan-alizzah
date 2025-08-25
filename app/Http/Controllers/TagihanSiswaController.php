@@ -471,4 +471,161 @@ class TagihanSiswaController extends Controller
             ]);
         }
     }
+    public function getTagihanSiswaByPosPemasukan(Request $request, $id)
+    {
+        try{
+            // First, get TagihanSiswa data
+            $query = TagihanSiswa::with([
+                'bulan',
+                'pos_pemasukan'
+            ])
+            ->select([
+                'id',
+                'bulan_id',
+                'siswa_kelas_id',
+                'pos_pemasukan_id',
+                'nominal',
+                'diskon_persen',
+                'diskon_nominal',
+                'nominal_awal',
+                'jumlah_harus_dibayar',
+                'status',
+            ])
+            ->where('pos_pemasukan_id', $id);
+
+            $tagihanSiswa = $query->get();
+
+            if ($tagihanSiswa->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'data' => []
+                ]);
+            }
+
+            // Get unique siswa_kelas_id from tagihan
+            $siswaKelasIds = $tagihanSiswa->pluck('siswa_kelas_id')->unique()->values();
+
+            // Get siswa_kelas data from SIAKAD database
+            $siswaKelasQuery = \App\Models\SIAKAD\SiswaKelas::with([
+                'siswa:id,nama_lengkap,jenis_kelamin',
+                'kelas.jenjang:id,nama_jenjang'
+            ])
+            ->whereIn('id', $siswaKelasIds);
+
+            // Apply filters if provided
+            if ($request->kelas_id) {
+                $siswaKelasQuery->where('kelas_id', $request->kelas_id);
+            }
+
+            if ($request->jenjang_id) {
+                $siswaKelasQuery->whereHas('kelas', function($q) use ($request) {
+                    $q->where('jenjang_id', $request->jenjang_id);
+                });
+            }
+
+            $siswaKelasData = $siswaKelasQuery->get()->keyBy('id');
+
+            // Filter tagihan based on siswa_kelas that meet the filter criteria
+            $filteredTagihan = $tagihanSiswa->filter(function($tagihan) use ($siswaKelasData) {
+                return $siswaKelasData->has($tagihan->siswa_kelas_id);
+            });
+
+            // Combine the data
+            $result = $filteredTagihan->map(function($tagihan) use ($siswaKelasData) {
+                $siswaKelas = $siswaKelasData->get($tagihan->siswa_kelas_id);
+
+                return [
+                    'id' => $tagihan->id,
+                    'bulan_id' => $tagihan->bulan_id,
+                    'siswa_kelas_id' => $tagihan->siswa_kelas_id,
+                    'pos_pemasukan_id' => $tagihan->pos_pemasukan_id,
+                    'nominal' => $tagihan->nominal,
+                    'diskon_persen' => $tagihan->diskon_persen,
+                    'diskon_nominal' => $tagihan->diskon_nominal,
+                    'nominal_awal' => $tagihan->nominal_awal,
+                    'jumlah_harus_dibayar' => $tagihan->jumlah_harus_dibayar,
+                    'status' => $tagihan->status,
+                    'bulan' => $tagihan->bulan,
+                    'pos_pemasukan' => $tagihan->pos_pemasukan,
+                    'siswa_kelas' => [
+                        'id' => $siswaKelas->id ?? null,
+                        'siswa' => [
+                            'id' => $siswaKelas->siswa->id ?? null,
+                            'nama_lengkap' => $siswaKelas->siswa->nama_lengkap ?? 'Unknown',
+                            'jenis_kelamin' => $siswaKelas->siswa->jenis_kelamin ?? null,
+                        ],
+                        'kelas' => [
+                            'id' => $siswaKelas->kelas->id ?? null,
+                            'nama_kelas' => $siswaKelas->kelas->nama_kelas ?? 'Unknown',
+                            'jenjang' => [
+                                'id' => $siswaKelas->kelas->jenjang->id ?? null,
+                                'nama_jenjang' => $siswaKelas->kelas->jenjang->nama_jenjang ?? 'Unknown',
+                            ]
+                        ]
+                    ]
+                ];
+            })->values();
+
+            return response()->json([
+                'success' => true,
+                'data' => $result
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error in getTagihanSiswa: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data tagihan siswa'
+            ], 500);
+        }
+    }
+
+    public function updateNominal(Request $request, $id)
+    {
+        $rules = [
+            'nominal' => 'required|numeric|min:0',
+        ];
+
+        $messages = [
+            'required' => ':attribute harus diisi',
+            'numeric' => ':attribute harus berupa angka',
+            'min' => ':attribute tidak boleh kurang dari 0',
+        ];
+
+        $attributes = [
+            'nominal' => 'Nominal',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages, $attributes);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'message_validation' => $validator->getMessageBag()
+            ]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $tagihan = TagihanSiswa::findOrFail($id);
+
+            $tagihan->update([
+                'nominal' => $request->nominal,
+            ]);
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil mengupdate nominal tagihan',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Log::error($th);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengupdate nominal tagihan',
+            ]);
+        }
+    }
 }

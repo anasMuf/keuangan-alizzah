@@ -307,12 +307,21 @@ class PemasukanController extends Controller
 
                     // create tabungan siswa if istabungan is true
                     if (isset($item['istabungan']) && $item['istabungan']) {
-                        TabunganSiswa::create([
-                            'siswa_id' => $siswaid,
-                            'debit' => $item['dibayar'],
-                            'kredit' => 0,
-                            'tanggal' => $tanggal,
-                        ]);
+                        if($item['dibayar'] > 0){
+                            TabunganSiswa::create([
+                                'siswa_id' => $siswaid,
+                                'debit' => $item['dibayar'],
+                                'kredit' => 0,
+                                'tanggal' => $tanggal,
+                            ]);
+                        }elseif($item['dibayar'] < 0){
+                            TabunganSiswa::create([
+                                'siswa_id' => $siswaid,
+                                'debit' => 0,
+                                'kredit' => $item['dibayar'],
+                                'tanggal' => $tanggal,
+                            ]);
+                        }
                     }
 
                     $totalTagihan += $subtotal;
@@ -356,8 +365,21 @@ class PemasukanController extends Controller
     public function delete($id){
         DB::beginTransaction();
         try {
-            $pemasukan = Pemasukan::find($id);
-            PemasukanDetail::where('pemasukan_id',$pemasukan->id)->delete();
+            $pemasukan = Pemasukan::with('siswa_kelas')->find($id);
+            $pemasukanDetail = PemasukanDetail::with('pos_pemasukan')->where('pemasukan_id',$pemasukan->id)->get();
+            foreach ($pemasukanDetail as $detail) {
+                if($detail->pos_pemasukan && $detail->pos_pemasukan->is_tabungan && !$detail->pos_pemasukan->waijb){
+                    // jika pos pemasukan adalah tabungan umum, maka hapus tabungan umum siswa
+                    TabunganSiswa::where('siswa_id', $pemasukan->siswa_kelas->siswa_id)
+                        ->whereDate('tanggal', $pemasukan->tanggal)
+                        ->where(function($query) use ($detail) {
+                            $query->where('debit', $detail->subtotal)
+                                  ->orWhere('kredit', $detail->subtotal);
+                        })->delete();
+                }
+                $detail->delete();
+            }
+
             PemasukanPembayaran::where('pemasukan_id',$pemasukan->id)->delete();
             Ledger::where([
                 'sumber_tabel' => 'pemasukan',

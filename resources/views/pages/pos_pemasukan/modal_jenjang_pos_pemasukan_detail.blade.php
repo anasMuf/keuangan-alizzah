@@ -15,7 +15,7 @@
             :selected="$data ? old('is_nominal_bulanan',$isNominalbulananSelected) : old('is_nominal_bulanan')" empty-option=".:: Pilih Jenis Pembayaran Nominal ::."/>
         </x-adminlte-select>
 
-        <x-adminlte-input type="number" min="0" step="500" name="nominal_valid" label="Nominal" placeholder="Tulis Nominal" id="nominal_valid"
+        <x-adminlte-input type="number" min="0" step="500" name="nominal_valid" label="Nominal" placeholder="Tulis Nominal" id="nominal_valid_detail"
             fgroup-class="col-md-12" disable-feedback enable-old-support error-key/>
 
         <div id="nominal_valid_bulanan">
@@ -45,19 +45,19 @@
     $('#modalJenjangPosPemaukanDetail').modal('show');
 
     $(() => {
-        $('#nominal_valid').parents('.form-group').hide();
+        $('#nominal_valid_detail').parents('.form-group').addClass('d-none');
         $('#nominal_valid_bulanan').hide();
     })
 
     $('#is_nominal_bulanan').change(function() {
         if ($(this).val() === 'bulanan') {
-            $('#nominal_valid').parents('.form-group').hide();
+            $('#nominal_valid_detail').parents('.form-group').hide();
             $('#nominal_valid_bulanan').show();
         } else if ($(this).val() === 'nonbulan') {
-            $('#nominal_valid').parents('.form-group').show();
+            $('#nominal_valid_detail').parents('.form-group').show();
             $('#nominal_valid_bulanan').hide();
         } else {
-            $('#nominal_valid').parents('.form-group').hide();
+            $('#nominal_valid_detail').parents('.form-group').hide();
             $('#nominal_valid_bulanan').hide();
         }
     })
