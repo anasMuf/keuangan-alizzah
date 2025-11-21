@@ -164,8 +164,8 @@ class TagihanSiswaService
                                 LogPretty::info('Berhasil Membuat tagihan siswa kelas id ' . $siswa_kelas_id . ' untuk pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan);
                             }
                         }else {
-                            continue;
                             LogPretty::info('Gagal, Jenjang pos pemasukan tidak sesuai dengan jenjang siswa kelas, melewati pos pemasukan: ' . $itemPosPemasukan->nama_pos_pemasukan);
+                            continue;
                             // return [
                             //     'success' => false,
                             //     'message' => 'Tagihan siswa gagal dibuat. pos pemasukan ' . $itemPosPemasukan->nama_pos_pemasukan . ' tidak sesuai dengan jenjang siswa kelas.',
